@@ -20,7 +20,24 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 5000;
-const upload = multer({ dest: 'uploads/' });
+
+// ============================================
+// FIX: Ensure uploads and session folders exist
+// ============================================
+if (!fs.existsSync('uploads')) {
+  fs.mkdirSync('uploads', { recursive: true });
+}
+if (!fs.existsSync('session')) {
+  fs.mkdirSync('session', { recursive: true });
+}
+if (!fs.existsSync('public')) {
+  fs.mkdirSync('public', { recursive: true });
+}
+
+const upload = multer({ 
+  dest: 'uploads/',
+  limits: { fileSize: 10 * 1024 * 1024 }
+});
 
 app.use(cors());
 app.use(express.json());
