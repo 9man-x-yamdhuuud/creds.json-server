@@ -1,1109 +1,657 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⚡ WhatsApp Auto-Messenger</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary: #6C63FF;
-            --primary-dark: #5A52D5;
-            --secondary: #00D2FF;
-            --success: #10B981;
-            --danger: #EF4444;
-            --warning: #F59E0B;
-            --bg-dark: #0A0A1A;
-            --bg-card: rgba(255, 255, 255, 0.04);
-            --border-color: rgba(255, 255, 255, 0.06);
-            --text-primary: #FFFFFF;
-            --text-secondary: #A8B2D1;
-            --text-muted: #4A5568;
-            --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-            --radius: 16px;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        }
-
-        body {
-            font-family: var(--font);
-            background: var(--bg-dark);
-            min-height: 100vh;
-            color: var(--text-primary);
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-
-        /* Animated Background */
-        .bg-animation {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            overflow: hidden;
-        }
-
-        .bg-animation .orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(100px);
-            opacity: 0.25;
-            animation: floatOrb 25s infinite ease-in-out;
-        }
-
-        .bg-animation .orb:nth-child(1) {
-            width: 700px;
-            height: 700px;
-            background: var(--primary);
-            top: -300px;
-            right: -200px;
-            animation-delay: 0s;
-        }
-
-        .bg-animation .orb:nth-child(2) {
-            width: 600px;
-            height: 600px;
-            background: var(--secondary);
-            bottom: -250px;
-            left: -200px;
-            animation-delay: -8s;
-        }
-
-        .bg-animation .orb:nth-child(3) {
-            width: 500px;
-            height: 500px;
-            background: var(--success);
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            animation-delay: -16s;
-            opacity: 0.1;
-        }
-
-        @keyframes floatOrb {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            25% { transform: translate(60px, -60px) scale(1.1); }
-            50% { transform: translate(-40px, 40px) scale(0.9); }
-            75% { transform: translate(30px, -30px) scale(1.05); }
-        }
-
-        .container {
-            position: relative;
-            z-index: 1;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        /* Header */
-        .header {
-            text-align: center;
-            padding: 30px 0 25px;
-        }
-
-        .header .logo-wrapper {
-            display: inline-flex;
-            align-items: center;
-            gap: 16px;
-            margin-bottom: 10px;
-        }
-
-        .header .logo-icon {
-            width: 56px;
-            height: 56px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 26px;
-            box-shadow: 0 0 50px rgba(108, 99, 255, 0.25);
-            animation: glowPulse 4s infinite;
-        }
-
-        @keyframes glowPulse {
-            0%, 100% { box-shadow: 0 0 50px rgba(108, 99, 255, 0.25); }
-            50% { box-shadow: 0 0 70px rgba(108, 99, 255, 0.45); }
-        }
-
-        .header h1 {
-            font-size: 2.4rem;
-            font-weight: 900;
-            background: linear-gradient(135deg, #FFFFFF 0%, var(--secondary) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .header .subtitle {
-            color: var(--text-secondary);
-            font-size: 1rem;
-            margin-top: 4px;
-        }
-
-        .header .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(16, 185, 129, 0.12);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            padding: 6px 20px;
-            border-radius: 50px;
-            font-size: 0.8rem;
-            color: var(--success);
-            margin-top: 14px;
-            font-weight: 500;
-        }
-
-        .header .status-badge .dot {
-            width: 8px;
-            height: 8px;
-            background: var(--success);
-            border-radius: 50%;
-            animation: dotPulse 2s infinite;
-        }
-
-        @keyframes dotPulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(0.7); }
-        }
-
-        /* Glass Card */
-        .glass-card {
-            background: var(--bg-card);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border-radius: var(--radius);
-            padding: 28px;
-            border: 1px solid var(--border-color);
-            transition: var(--transition);
-        }
-
-        .glass-card:hover {
-            border-color: rgba(108, 99, 255, 0.15);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow);
-        }
-
-        .card-title {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            margin-bottom: 20px;
-        }
-
-        .card-title i {
-            color: var(--primary);
-            font-size: 1.1rem;
-            width: 24px;
-            text-align: center;
-        }
-
-        /* Grid */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-            margin-top: 24px;
-        }
-
-        @media (max-width: 1024px) {
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Form Elements */
-        .form-group {
-            margin-bottom: 18px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 0.8rem;
-            font-weight: 500;
-            color: var(--text-secondary);
-            margin-bottom: 5px;
-        }
-
-        .form-group label i {
-            margin-right: 8px;
-            color: var(--primary);
-        }
-
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            padding: 12px 16px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            color: var(--text-primary);
-            font-size: 0.95rem;
-            transition: var(--transition);
-            outline: none;
-            font-family: var(--font);
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus {
-            border-color: var(--primary);
-            background: rgba(255, 255, 255, 0.08);
-            box-shadow: 0 0 0 4px rgba(108, 99, 255, 0.08);
-        }
-
-        .form-group input::placeholder {
-            color: var(--text-muted);
-        }
-
-        .form-group textarea {
-            min-height: 80px;
-            resize: vertical;
-        }
-
-        /* Cred Upload Area */
-        .cred-upload-area {
-            border: 2px dashed var(--border-color);
-            border-radius: 14px;
-            padding: 30px 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: var(--transition);
-            position: relative;
-            background: rgba(255, 255, 255, 0.02);
-        }
-
-        .cred-upload-area:hover {
-            border-color: var(--primary);
-            background: rgba(108, 99, 255, 0.04);
-        }
-
-        .cred-upload-area.dragover {
-            border-color: var(--primary);
-            background: rgba(108, 99, 255, 0.08);
-            transform: scale(1.01);
-        }
-
-        .cred-upload-area .upload-icon {
-            font-size: 2.5rem;
-            color: var(--text-muted);
-            margin-bottom: 10px;
-            transition: var(--transition);
-        }
-
-        .cred-upload-area:hover .upload-icon {
-            color: var(--primary);
-            transform: translateY(-3px);
-        }
-
-        .cred-upload-area p {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        .cred-upload-area .highlight {
-            color: var(--primary);
-            font-weight: 600;
-            background: rgba(108, 99, 255, 0.1);
-            padding: 2px 10px;
-            border-radius: 6px;
-        }
-
-        .cred-upload-area .sub-text {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
-
-        .cred-upload-area input[type="file"] {
-            position: absolute;
-            inset: 0;
-            opacity: 0;
-            cursor: pointer;
-        }
-
-        #credFileStatus {
-            margin-top: 12px;
-            padding: 10px 16px;
-            background: rgba(16, 185, 129, 0.08);
-            border-radius: 10px;
-            border: 1px solid rgba(16, 185, 129, 0.15);
-            color: var(--success);
-            font-size: 0.85rem;
-            display: none;
-            align-items: center;
-            gap: 10px;
-            font-weight: 500;
-            animation: fadeSlide 0.4s ease;
-        }
-
-        #credFileStatus.show {
-            display: flex;
-        }
-
-        @keyframes fadeSlide {
-            from { opacity: 0; transform: translateY(-8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Buttons */
-        .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            font-family: var(--font);
-            width: 100%;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: rgba(255, 255, 255, 0.08);
-            transform: translateX(-100%);
-            transition: transform 0.5s;
-        }
-
-        .btn:hover::after {
-            transform: translateX(100%);
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            box-shadow: 0 4px 20px rgba(108, 99, 255, 0.25);
-        }
-
-        .btn-primary:hover:not(:disabled) {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 35px rgba(108, 99, 255, 0.4);
-        }
-
-        .btn-primary:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, var(--success), #059669);
-            color: white;
-            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.25);
-        }
-
-        .btn-success:hover:not(:disabled) {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 35px rgba(16, 185, 129, 0.4);
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, var(--danger), #DC2626);
-            color: white;
-            box-shadow: 0 4px 20px rgba(239, 68, 68, 0.2);
-        }
-
-        .btn-danger:hover:not(:disabled) {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 35px rgba(239, 68, 68, 0.35);
-        }
-
-        /* Status Display */
-        .status-display {
-            margin-top: 16px;
-            padding: 16px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            display: none;
-        }
-
-        .status-display.show {
-            display: block;
-            animation: fadeSlide 0.4s ease;
-        }
-
-        .status-display .status-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 4px 0;
-            font-size: 0.85rem;
-        }
-
-        .status-display .status-row .label {
-            color: var(--text-muted);
-        }
-
-        .status-display .status-row .value {
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-
-        .status-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 3px 14px;
-            border-radius: 50px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        .status-indicator .dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            display: inline-block;
-        }
-
-        .status-indicator.online {
-            background: rgba(16, 185, 129, 0.12);
-            color: var(--success);
-        }
-
-        .status-indicator.online .dot {
-            background: var(--success);
-            animation: dotPulse 2s infinite;
-        }
-
-        .status-indicator.offline {
-            background: rgba(239, 68, 68, 0.12);
-            color: var(--danger);
-        }
-
-        .status-indicator.offline .dot {
-            background: var(--danger);
-        }
-
-        /* Stats */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-top: 12px;
-        }
-
-        .stat-box {
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 12px;
-            padding: 14px 10px;
-            text-align: center;
-            border: 1px solid var(--border-color);
-            transition: var(--transition);
-        }
-
-        .stat-box:hover {
-            border-color: rgba(108, 99, 255, 0.15);
-        }
-
-        .stat-box .stat-number {
-            font-size: 1.6rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .stat-box .stat-label {
-            font-size: 0.6rem;
-            color: var(--text-muted);
-            margin-top: 3px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-weight: 600;
-        }
-
-        /* Uptime */
-        .uptime-display {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            background: rgba(16, 185, 129, 0.06);
-            border-radius: 12px;
-            border: 1px solid rgba(16, 185, 129, 0.1);
-            margin-top: 12px;
-        }
-
-        .uptime-display .uptime-icon {
-            color: var(--success);
-            font-size: 1rem;
-            animation: dotPulse 2s infinite;
-        }
-
-        .uptime-display .uptime-label {
-            color: var(--text-muted);
-            font-size: 0.8rem;
-        }
-
-        .uptime-display .uptime-value {
-            font-weight: 700;
-            color: var(--success);
-            font-size: 1rem;
-            font-variant-numeric: tabular-nums;
-            font-family: monospace;
-        }
-
-        .uptime-display .uptime-badge {
-            margin-left: auto;
-            font-size: 0.6rem;
-            color: var(--text-muted);
-            background: rgba(255, 255, 255, 0.04);
-            padding: 3px 12px;
-            border-radius: 50px;
-            border: 1px solid var(--border-color);
-        }
-
-        /* Last Message */
-        .last-message-box {
-            margin-top: 12px;
-            padding: 12px 16px;
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
-        }
-
-        .last-message-box .label {
-            font-size: 0.65rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-weight: 600;
-        }
-
-        .last-message-box .message {
-            margin-top: 3px;
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-            word-break: break-all;
-        }
-
-        /* Toast */
-        .toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            max-width: 380px;
-            width: 100%;
-        }
-
-        .toast {
-            padding: 14px 18px;
-            border-radius: 12px;
-            background: rgba(16, 16, 35, 0.95);
-            backdrop-filter: blur(24px);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
-            animation: slideInRight 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-        }
-
-        .toast.removing {
-            animation: slideOutRight 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        }
-
-        .toast.success { border-left: 4px solid var(--success); }
-        .toast.error { border-left: 4px solid var(--danger); }
-        .toast.info { border-left: 4px solid var(--primary); }
-        .toast.warning { border-left: 4px solid var(--warning); }
-
-        .toast .toast-icon {
-            font-size: 1.1rem;
-            flex-shrink: 0;
-            margin-top: 1px;
-        }
-
-        .toast .toast-title {
-            font-weight: 600;
-            font-size: 0.85rem;
-        }
-
-        .toast .toast-message {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            margin-top: 1px;
-        }
-
-        @keyframes slideInRight {
-            from { transform: translateX(120%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        @keyframes slideOutRight {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(120%); opacity: 0; }
-        }
-
-        /* Spinner */
-        .spinner {
-            width: 18px;
-            height: 18px;
-            border: 3px solid rgba(255, 255, 255, 0.1);
-            border-top-color: #fff;
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-            display: inline-block;
-            flex-shrink: 0;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .container { padding: 12px; }
-            .header h1 { font-size: 1.6rem; }
-            .header .logo-icon { width: 44px; height: 44px; font-size: 20px; }
-            .glass-card { padding: 18px; }
-            .stats-grid { grid-template-columns: 1fr 1fr; }
-            .stat-box .stat-number { font-size: 1.3rem; }
-            .toast-container { top: 10px; right: 10px; max-width: calc(100% - 20px); }
-        }
-
-        @media (max-width: 480px) {
-            .header h1 { font-size: 1.3rem; }
-            .stats-grid { grid-template-columns: 1fr; }
-            .uptime-display { flex-wrap: wrap; gap: 5px; }
-            .uptime-display .uptime-badge { margin-left: 0; }
-        }
-
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.02); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 10px; }
-
-        .hidden { display: none !important; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>whatsApp · message bot</title>
+  <!-- Google Font + icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, system-ui, sans-serif;
+      background: radial-gradient(circle at 20% 30%, #111827, #0a0e17 90%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      color: #f1f5f9;
+      line-height: 1.5;
+    }
+
+    /* ——— glassmorphism premium ——— */
+    .glass-orb {
+      background: rgba(15, 23, 42, 0.55);
+      backdrop-filter: blur(18px) saturate(200%);
+      -webkit-backdrop-filter: blur(18px) saturate(200%);
+      border-radius: 3.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      box-shadow: 0 40px 70px -25px rgba(0, 0, 0, 0.9), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+      padding: 2.5rem 2.8rem;
+      max-width: 780px;
+      width: 100%;
+      transition: all 0.2s ease;
+    }
+
+    @media (max-width: 550px) {
+      .glass-orb { padding: 1.8rem 1.2rem; border-radius: 2.4rem; }
+    }
+
+    /* ——— header ——— */
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .brand i {
+      font-size: 2.3rem;
+      background: linear-gradient(145deg, #25d366, #0f9d58);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      filter: drop-shadow(0 0 8px #25d36644);
+    }
+
+    .brand h1 {
+      font-weight: 700;
+      font-size: 2.1rem;
+      letter-spacing: -0.02em;
+      background: linear-gradient(to right, #f0f4ff, #b9c8f0);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .tagline {
+      font-weight: 400;
+      font-size: 0.9rem;
+      color: #94a3b8;
+      margin-top: -0.1rem;
+      margin-bottom: 2rem;
+      padding-left: 0.3rem;
+      border-left: 3px solid #25d366;
+      padding-left: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .tagline i { color: #25d366; font-size: 0.8rem; }
+
+    /* ——— forms ——— */
+    .flow {
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .field label {
+      font-weight: 600;
+      font-size: 0.8rem;
+      letter-spacing: 0.04em;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .field label i {
+      color: #25d366;
+      width: 1.2rem;
+      font-size: 0.95rem;
+    }
+
+    .field input,
+    .field select {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 2.2rem;
+      padding: 0.9rem 1.5rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      color: #f1f5f9;
+      outline: none;
+      transition: 0.2s;
+      backdrop-filter: blur(4px);
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: #25d366;
+      box-shadow: 0 0 0 4px rgba(37, 211, 102, 0.12);
+      background: rgba(0, 0, 0, 0.6);
+    }
+
+    .field input::placeholder {
+      color: #5f6b89;
+      font-weight: 400;
+    }
+
+    /* file upload */
+    .file-zone {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 3rem;
+      padding: 0.2rem 0.2rem 0.2rem 1.6rem;
+      border: 1px dashed rgba(255, 255, 255, 0.06);
+      transition: 0.15s;
+    }
+
+    .file-zone:hover { border-color: #25d36644; }
+
+    .file-zone input[type="file"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+
+    .file-zone .fname {
+      font-size: 0.9rem;
+      color: #b9c8f0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .file-zone .fbtn {
+      background: #25d366;
+      border: none;
+      border-radius: 2.5rem;
+      padding: 0.55rem 1.4rem;
+      font-weight: 700;
+      font-size: 0.8rem;
+      color: #0b0e18;
+      transition: 0.2s;
+      white-space: nowrap;
+      cursor: default;
+      box-shadow: 0 6px 14px -6px #25d36655;
+    }
+
+    /* buttons */
+    .btn {
+      border: none;
+      border-radius: 3rem;
+      padding: 0.95rem 2rem;
+      font-weight: 700;
+      font-size: 1rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.7rem;
+      transition: 0.2s cubic-bezier(0.2, 0.9, 0.4, 1);
+      cursor: pointer;
+      background: linear-gradient(145deg, #25d366, #18a84f);
+      color: #0b0e18;
+      box-shadow: 0 12px 28px -12px #25d36666;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      width: 100%;
+      letter-spacing: 0.01em;
+    }
+
+    .btn:hover {
+      transform: scale(1.02);
+      background: linear-gradient(145deg, #34e07a, #1ebc5a);
+      box-shadow: 0 16px 32px -10px #25d36688;
+    }
+
+    .btn:active { transform: scale(0.97); }
+
+    .btn-outline {
+      background: rgba(255, 255, 255, 0.02);
+      color: #eef3ff;
+      box-shadow: none;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .btn-outline:hover {
+      background: rgba(255, 255, 255, 0.07);
+      box-shadow: 0 8px 20px -10px #00000088;
+      transform: scale(1.01);
+    }
+
+    .btn-danger {
+      background: linear-gradient(145deg, #ff4d6d, #d93a58);
+      box-shadow: 0 12px 28px -12px #ff4d6d55;
+    }
+
+    .btn-danger:hover {
+      background: linear-gradient(145deg, #ff5f7c, #e64462);
+      box-shadow: 0 16px 32px -10px #ff4d6d77;
+    }
+
+    .row-2 {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      margin-top: 0.3rem;
+    }
+
+    .row-2 .btn { flex: 1 1 0; min-width: 130px; }
+
+    /* ——— status panel ——— */
+    .status-glass {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 2.5rem;
+      padding: 1.2rem 1.8rem;
+      margin-top: 1.8rem;
+      border: 1px solid rgba(255, 255, 255, 0.02);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.8rem 1.2rem;
+      backdrop-filter: blur(4px);
+    }
+
+    .chip {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.9rem;
+      background: rgba(255, 255, 255, 0.02);
+      padding: 0.3rem 1.2rem 0.3rem 0.8rem;
+      border-radius: 3rem;
+      font-weight: 500;
+    }
+
+    .chip i { color: #25d366; font-size: 1rem; }
+
+    .dot {
+      display: inline-block;
+      width: 0.6rem;
+      height: 0.6rem;
+      border-radius: 50%;
+      background: #475569;
+      margin-right: 0.25rem;
+    }
+
+    .dot.on { background: #25d366; box-shadow: 0 0 10px #25d366aa; }
+    .dot.off { background: #ff4d6d; box-shadow: 0 0 10px #ff4d6daa; }
+
+    .stat-badge {
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 2rem;
+      padding: 0.35rem 1.2rem;
+      text-align: center;
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+
+    .stat-badge span { font-weight: 700; color: #f1f5f9; }
+
+    .toast {
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(12px);
+      padding: 0.8rem 1.6rem;
+      border-radius: 3rem;
+      border-left: 5px solid #25d366;
+      font-weight: 500;
+      font-size: 0.9rem;
+      margin-top: 1rem;
+      color: #eef3ff;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .toast i { color: #25d366; }
+
+    .hidden { display: none !important; }
+
+    .pair-box {
+      background: #1f253a;
+      border-radius: 3rem;
+      padding: 0.8rem 1.6rem;
+      text-align: center;
+      font-weight: 600;
+      border: 1px solid #25d36633;
+      margin-top: 0.8rem;
+      letter-spacing: 1px;
+    }
+
+    .pair-box i { color: #25d366; margin-right: 8px; }
+
+    .text-muted { color: #64748b; font-size: 0.7rem; margin-top: 0.5rem; text-align: center; }
+
+    @media (max-width: 480px) {
+      .status-glass { flex-direction: column; align-items: stretch; }
+      .row-2 { flex-direction: column; }
+    }
+  </style>
 </head>
 <body>
 
-    <!-- Animated Background -->
-    <div class="bg-animation">
-        <div class="orb"></div>
-        <div class="orb"></div>
-        <div class="orb"></div>
+<div class="glass-orb" id="app">
+  
+  <!-- header -->
+  <div class="brand">
+    <i class="fab fa-whatsapp"></i>
+    <h1>message•bot</h1>
+  </div>
+  <div class="tagline">
+    <i class="fas fa-bolt"></i> 
+    <span>automate · manage · go</span>
+  </div>
+
+  <!-- login zone -->
+  <div id="loginZone" class="flow">
+    <div class="field">
+      <label><i class="fas fa-phone-alt"></i> phone number</label>
+      <input type="text" id="phoneInput" placeholder="+92 300 1234567" value="923001234567">
+    </div>
+    <button class="btn" id="loginBtn"><i class="fas fa-key"></i> login / pair</button>
+    <div id="loginToast" class="toast hidden"><i class="fas fa-circle-check"></i> <span id="loginMsg">ready</span></div>
+    <div id="pairBox" class="pair-box hidden">
+      <i class="fas fa-shield-alt"></i> pairing code: <span id="pairCodeDisplay" style="font-weight: 800; letter-spacing: 3px;">——</span>
+    </div>
+  </div>
+
+  <!-- control zone -->
+  <div id="controlZone" class="hidden flow" style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.03); padding-top: 2rem;">
+    
+    <div class="field">
+      <label><i class="fas fa-bullseye"></i> target (ID or number)</label>
+      <input type="text" id="targetInput" placeholder="923001234567-123456@g.us">
     </div>
 
-    <div class="container">
-        <!-- Header -->
-        <header class="header">
-            <div class="logo-wrapper">
-                <div class="logo-icon"><i class="fas fa-bolt"></i></div>
-                <h1>Auto-Messenger</h1>
-            </div>
-            <p class="subtitle">24/7 WhatsApp Automation &bull; creds.json only</p>
-            <div class="status-badge">
-                <span class="dot"></span>
-                System Online &bull; 24/7
-            </div>
-        </header>
-
-        <!-- Toast -->
-        <div class="toast-container" id="toastContainer"></div>
-
-        <!-- Main Grid -->
-        <div class="dashboard-grid">
-            <!-- LEFT: Upload creds.json -->
-            <div class="glass-card">
-                <div class="card-title">
-                    <i class="fas fa-file-upload"></i>
-                    Step 1: Upload creds.json
-                </div>
-
-                <form id="loginForm">
-                    <div class="form-group">
-                        <div class="cred-upload-area" id="credUploadArea">
-                            <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
-                            <p>Drop your <span class="highlight">creds.json</span> here</p>
-                            <p class="sub-text">or click to browse &bull; WhatsApp session file</p>
-                            <input type="file" id="credFileInput" accept=".json" required>
-                        </div>
-                        <div id="credFileStatus">
-                            <i class="fas fa-check-circle"></i>
-                            <span id="credFileName">creds.json loaded</span>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary" id="loginBtn">
-                        <i class="fas fa-plug"></i>
-                        <span>Connect WhatsApp</span>
-                    </button>
-                </form>
-
-                <div class="status-display" id="statusDisplay">
-                    <div class="status-row">
-                        <span class="label">Status</span>
-                        <span class="value">
-                            <span class="status-indicator online" id="statusIndicator">
-                                <span class="dot"></span> Connected
-                            </span>
-                        </span>
-                    </div>
-                    <div class="status-row">
-                        <span class="label">Phone</span>
-                        <span class="value" id="phoneDisplay">-</span>
-                    </div>
-                </div>
-
-                <div class="uptime-display">
-                    <span class="uptime-icon"><i class="fas fa-clock"></i></span>
-                    <span class="uptime-label">Uptime:</span>
-                    <span class="uptime-value" id="uptimeValue">00:00:00</span>
-                    <span class="uptime-badge">24/7</span>
-                </div>
-            </div>
-
-            <!-- RIGHT: Messaging -->
-            <div class="glass-card">
-                <div class="card-title">
-                    <i class="fas fa-paper-plane"></i>
-                    Step 2: Start Messaging
-                </div>
-
-                <form id="messagingForm">
-                    <div class="form-group">
-                        <label><i class="fas fa-users"></i> Target</label>
-                        <input type="text" id="targetInput" placeholder="Group ID or Phone Number" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label><i class="fas fa-user-tag"></i> Sender Name (Optional)</label>
-                        <input type="text" id="hatersNameInput" placeholder="Your name">
-                    </div>
-
-                    <div class="form-group">
-                        <label><i class="fas fa-clock"></i> Speed (seconds)</label>
-                        <input type="number" id="speedInput" value="5" min="1" max="3600" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label><i class="fas fa-file-alt"></i> Message File (.txt)</label>
-                        <input type="file" id="messageFileInput" accept=".txt" required>
-                        <small style="color: var(--text-muted); display: block; margin-top: 4px; font-size: 0.7rem;">One message per line</small>
-                    </div>
-
-                    <button type="submit" class="btn btn-success" id="startBtn">
-                        <i class="fas fa-play"></i>
-                        <span>Start Messaging</span>
-                    </button>
-                </form>
-
-                <button class="btn btn-danger" id="stopBtn" style="margin-top: 12px;">
-                    <i class="fas fa-stop"></i>
-                    <span>Stop &amp; Logout</span>
-                </button>
-
-                <!-- Stats -->
-                <div class="stats-grid" style="margin-top: 16px;">
-                    <div class="stat-box">
-                        <div class="stat-number" id="sentCount">0</div>
-                        <div class="stat-label">Sent</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-number" id="failedCount">0</div>
-                        <div class="stat-label">Failed</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-number" id="totalMessages">0</div>
-                        <div class="stat-label">Queue</div>
-                    </div>
-                </div>
-
-                <div class="last-message-box">
-                    <div class="label">Last Message</div>
-                    <div class="message" id="lastMessageDisplay">-</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- System Info -->
-        <div class="glass-card" style="margin-top: 24px;">
-            <div class="card-title">
-                <i class="fas fa-server"></i>
-                System Status
-            </div>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
-                <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(255,255,255,0.02);border-radius:10px;border:1px solid var(--border-color);">
-                    <i class="fas fa-check-circle" style="color:var(--success);"></i>
-                    <span style="font-size:0.8rem;color:var(--text-secondary);">Status: <strong style="color:var(--success);">Online</strong></span>
-                </div>
-                <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(255,255,255,0.02);border-radius:10px;border:1px solid var(--border-color);">
-                    <i class="fas fa-infinity" style="color:var(--warning);"></i>
-                    <span style="font-size:0.8rem;color:var(--text-secondary);">Uptime: <strong style="color:var(--warning);">Infinite</strong></span>
-                </div>
-                <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(255,255,255,0.02);border-radius:10px;border:1px solid var(--border-color);">
-                    <i class="fas fa-shield-alt" style="color:var(--primary);"></i>
-                    <span style="font-size:0.8rem;color:var(--text-secondary);">Auth: <strong style="color:var(--primary);">creds.json</strong></span>
-                </div>
-                <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(255,255,255,0.02);border-radius:10px;border:1px solid var(--border-color);">
-                    <i class="fas fa-sync-alt" style="color:var(--secondary);"></i>
-                    <span style="font-size:0.8rem;color:var(--text-secondary);">Auto-Restore: <strong style="color:var(--secondary);">Enabled</strong></span>
-                </div>
-            </div>
-        </div>
+    <div class="field">
+      <label><i class="fas fa-user-tag"></i> sender prefix (optional)</label>
+      <input type="text" id="hatersNameInput" placeholder="Haters name">
     </div>
 
-    <script>
-        'use strict';
+    <div class="field">
+      <label><i class="fas fa-clock"></i> speed (seconds)</label>
+      <input type="number" id="speedInput" value="5" min="1" step="1">
+    </div>
 
-        let currentUniqueKey = '';
-        let statsInterval = null;
-        let startTime = Date.now();
-        let credFile = null;
+    <div class="field">
+      <label><i class="fas fa-file-alt"></i> messages (.txt)</label>
+      <div class="file-zone">
+        <span class="fname" id="fileLabel"><i class="fas fa-upload" style="margin-right: 6px;"></i> choose file...</span>
+        <span class="fbtn">browse</span>
+        <input type="file" id="messageFileInput" accept=".txt">
+      </div>
+    </div>
 
-        // Toast
-        function showToast(title, message, type = 'info') {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', info: 'fa-info-circle', warning: 'fa-exclamation-triangle' };
-            toast.innerHTML = `
-                <span class="toast-icon"><i class="fas ${icons[type] || icons.info}"></i></span>
-                <div class="toast-content">
-                    <div class="toast-title">${title}</div>
-                    <div class="toast-message">${message}</div>
-                </div>
-            `;
-            container.appendChild(toast);
-            setTimeout(() => {
-                toast.classList.add('removing');
-                setTimeout(() => toast.remove(), 300);
-            }, 5000);
+    <div class="row-2">
+      <button class="btn" id="startBtn"><i class="fas fa-play"></i> start</button>
+      <button class="btn btn-danger" id="stopBtn"><i class="fas fa-power-off"></i> stop & logout</button>
+    </div>
+
+    <div id="msgToast" class="toast hidden"><i class="fas fa-circle-info"></i> <span id="statusMsg">idle</span></div>
+
+    <!-- live status -->
+    <div class="status-glass">
+      <div class="chip"><i class="fas fa-wifi"></i> <span id="connectionBadge"><span class="dot off"></span> offline</span></div>
+      <div class="chip"><i class="fas fa-envelope"></i> <span id="msgCount">0</span> msgs</div>
+      <div class="chip"><i class="fas fa-paper-plane"></i> <span id="sentCount">0</span> sent</div>
+      <div class="chip"><i class="fas fa-exclamation-triangle"></i> <span id="failCount">0</span> fail</div>
+    </div>
+
+    <div class="text-muted">
+      <i class="fas fa-database" style="margin-right: 4px;"></i> session: <span id="sessionKeyDisplay">—</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    // ——— refs ———
+    const $ = id => document.getElementById(id);
+    const loginZone = $('loginZone');
+    const controlZone = $('controlZone');
+    const phoneInput = $('phoneInput');
+    const loginBtn = $('loginBtn');
+    const loginToast = $('loginToast');
+    const loginMsg = $('loginMsg');
+    const pairBox = $('pairBox');
+    const pairCodeDisplay = $('pairCodeDisplay');
+
+    const targetInput = $('targetInput');
+    const hatersNameInput = $('hatersNameInput');
+    const speedInput = $('speedInput');
+    const fileInput = $('messageFileInput');
+    const fileLabel = $('fileLabel');
+    const startBtn = $('startBtn');
+    const stopBtn = $('stopBtn');
+    const msgToast = $('msgToast');
+    const statusMsg = $('statusMsg');
+
+    const connectionBadge = $('connectionBadge');
+    const msgCount = $('msgCount');
+    const sentCount = $('sentCount');
+    const failCount = $('failCount');
+    const sessionKeyDisplay = $('sessionKeyDisplay');
+
+    // ——— state ———
+    let uniqueKey = null;
+    let pollInterval = null;
+    let isConnected = false;
+
+    // ——— helpers ———
+    function setToast(el, msg, type = 'info') {
+      el.classList.remove('hidden');
+      const span = el.querySelector('span');
+      if (span) span.textContent = msg;
+      const icon = el.querySelector('i');
+      if (type === 'success') {
+        icon.className = 'fas fa-circle-check';
+        el.style.borderLeftColor = '#25d366';
+      } else if (type === 'error') {
+        icon.className = 'fas fa-circle-exclamation';
+        el.style.borderLeftColor = '#ff4d6d';
+      } else {
+        icon.className = 'fas fa-circle-info';
+        el.style.borderLeftColor = '#4a8eff';
+      }
+    }
+
+    function setLoginToast(msg, isError = false) {
+      setToast(loginToast, msg, isError ? 'error' : 'success');
+    }
+
+    function setMsgToast(msg, type = 'info') {
+      setToast(msgToast, msg, type);
+    }
+
+    function updateUI() {
+      if (!uniqueKey) return;
+      fetch(`/sessionStatus/${uniqueKey}`)
+        .then(r => r.json())
+        .then(data => {
+          if (!data.exists) return;
+          isConnected = data.connected || false;
+          const badge = connectionBadge;
+          if (isConnected) {
+            badge.innerHTML = `<span class="dot on"></span> online`;
+          } else {
+            badge.innerHTML = `<span class="dot off"></span> offline`;
+          }
+          msgCount.textContent = data.messageCount || 0;
+          sentCount.textContent = data.sent || 0;
+          failCount.textContent = data.failed || 0;
+          sessionKeyDisplay.textContent = uniqueKey.substring(0, 12) + '…';
+          if (data.target) targetInput.value = data.target;
+          if (data.speed) speedInput.value = data.speed;
+        })
+        .catch(() => {});
+    }
+
+    function startPolling() {
+      if (pollInterval) clearInterval(pollInterval);
+      pollInterval = setInterval(updateUI, 2500);
+      updateUI();
+    }
+
+    function stopPolling() {
+      if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
+    }
+
+    // ——— login ———
+    loginBtn.addEventListener('click', async () => {
+      const phone = phoneInput.value.trim();
+      if (!phone) { setLoginToast('Phone number required', true); return; }
+      loginBtn.disabled = true;
+      loginBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> connecting...';
+      setLoginToast('Requesting pairing...');
+
+      try {
+        const resp = await fetch('/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phoneNumber: phone })
+        });
+        const data = await resp.json();
+        if (!data.success) {
+          setLoginToast(data.message || 'Login error', true);
+          loginBtn.disabled = false;
+          loginBtn.innerHTML = '<i class="fas fa-key"></i> login / pair';
+          return;
+        }
+        uniqueKey = data.uniqueKey;
+        if (data.pairingCode) {
+          pairBox.classList.remove('hidden');
+          pairCodeDisplay.textContent = data.pairingCode;
+          setLoginToast('Pairing code generated!');
+        } else if (data.connected) {
+          pairBox.classList.add('hidden');
+          setLoginToast('Already connected!');
+          loginZone.classList.add('hidden');
+          controlZone.classList.remove('hidden');
+          startPolling();
+        } else {
+          setLoginToast('Connected! Waiting for pairing...');
         }
 
-        // Uptime
-        function updateUptime() {
-            const elapsed = Math.floor((Date.now() - startTime) / 1000);
-            const h = String(Math.floor(elapsed / 3600)).padStart(2, '0');
-            const m = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
-            const s = String(elapsed % 60).padStart(2, '0');
-            document.getElementById('uptimeValue').textContent = `${h}:${m}:${s}`;
+        if (uniqueKey) {
+          setTimeout(() => {
+            loginZone.classList.add('hidden');
+            controlZone.classList.remove('hidden');
+            sessionKeyDisplay.textContent = uniqueKey.substring(0, 12) + '…';
+            startPolling();
+          }, 600);
         }
-        updateUptime();
-        setInterval(updateUptime, 1000);
+      } catch (e) {
+        setLoginToast('Network error: ' + e.message, true);
+      } finally {
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = '<i class="fas fa-key"></i> login / pair';
+      }
+    });
 
-        // Cred Upload
-        const credUploadArea = document.getElementById('credUploadArea');
-        const credFileInput = document.getElementById('credFileInput');
-        const credFileStatus = document.getElementById('credFileStatus');
-        const credFileName = document.getElementById('credFileName');
+    // ——— start messaging ———
+    startBtn.addEventListener('click', async () => {
+      if (!uniqueKey) { setMsgToast('No session. Login first.', 'error'); return; }
+      const target = targetInput.value.trim();
+      const speed = speedInput.value.trim();
+      const hatersName = hatersNameInput.value.trim();
+      const file = fileInput.files[0];
 
-        credUploadArea.addEventListener('click', () => credFileInput.click());
+      if (!target) { setMsgToast('Target required', 'error'); return; }
+      if (!speed || parseInt(speed) < 1) { setMsgToast('Speed must be >= 1', 'error'); return; }
+      if (!file) { setMsgToast('Select a .txt file', 'error'); return; }
 
-        credUploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            credUploadArea.classList.add('dragover');
+      const formData = new FormData();
+      formData.append('uniqueKey', uniqueKey);
+      formData.append('target', target);
+      formData.append('hatersName', hatersName);
+      formData.append('speed', speed);
+      formData.append('messageFile', file);
+
+      startBtn.disabled = true;
+      startBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> starting...';
+      setMsgToast('Uploading & starting...');
+
+      try {
+        const resp = await fetch('/startMessaging', {
+          method: 'POST',
+          body: formData
         });
-        credUploadArea.addEventListener('dragleave', () => {
-            credUploadArea.classList.remove('dragover');
-        });
-        credUploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            credUploadArea.classList.remove('dragover');
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                const file = files[0];
-                if (file.name === 'creds.json') {
-                    handleCredFile(file);
-                } else {
-                    showToast('Error', 'Please upload a valid creds.json file', 'error');
-                }
-            }
-        });
-
-        credFileInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                if (file.name === 'creds.json') {
-                    handleCredFile(file);
-                } else {
-                    showToast('Error', 'Please upload a valid creds.json file', 'error');
-                    e.target.value = '';
-                }
-            }
-        });
-
-        function handleCredFile(file) {
-            credFile = file;
-            credFileName.textContent = file.name;
-            credFileStatus.classList.add('show');
-            showToast('Success', 'creds.json loaded successfully!', 'success');
+        const data = await resp.json();
+        if (data.success) {
+          setMsgToast(`✅ ${data.message} (${data.messageCount} msgs)`, 'success');
+          updateUI();
+        } else {
+          setMsgToast('❌ ' + (data.message || 'Start failed'), 'error');
         }
+      } catch (e) {
+        setMsgToast('Network error: ' + e.message, 'error');
+      } finally {
+        startBtn.disabled = false;
+        startBtn.innerHTML = '<i class="fas fa-play"></i> start';
+        fileInput.value = '';
+        fileLabel.innerHTML = '<i class="fas fa-upload" style="margin-right:6px;"></i> choose file...';
+      }
+    });
 
-        // Login
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('loginBtn');
-
-            if (!credFile) {
-                showToast('Error', 'Please upload creds.json first', 'error');
-                return;
-            }
-
-            btn.disabled = true;
-            btn.innerHTML = '<span class="spinner"></span> Connecting...';
-
-            try {
-                const formData = new FormData();
-                formData.append('credsFile', credFile);
-
-                const response = await fetch('/login-with-creds', { method: 'POST', body: formData });
-                const data = await response.json();
-
-                if (data.success) {
-                    currentUniqueKey = data.uniqueKey;
-                    showToast('Success', 'WhatsApp connected successfully!', 'success');
-
-                    document.getElementById('statusDisplay').classList.add('show');
-                    document.getElementById('statusIndicator').className = 'status-indicator online';
-                    document.getElementById('statusIndicator').innerHTML = '<span class="dot"></span> Connected';
-                    document.getElementById('phoneDisplay').textContent = 'Connected ✓';
-
-                    startStatsPolling();
-                } else {
-                    showToast('Error', data.message || 'Connection failed', 'error');
-                }
-            } catch (error) {
-                showToast('Error', 'Server error: ' + error.message, 'error');
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-plug"></i><span>Connect WhatsApp</span>';
-            }
+    // ——— stop & logout ———
+    stopBtn.addEventListener('click', async () => {
+      if (!uniqueKey) { setMsgToast('No session to stop', 'error'); return; }
+      stopBtn.disabled = true;
+      stopBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> stopping...';
+      try {
+        const resp = await fetch('/stop', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ uniqueKey })
         });
-
-        // Start Stats Polling
-        function startStatsPolling() {
-            if (statsInterval) clearInterval(statsInterval);
-            statsInterval = setInterval(async () => {
-                if (!currentUniqueKey) return;
-                try {
-                    const response = await fetch(`/sessionStatus/${currentUniqueKey}`);
-                    const data = await response.json();
-                    if (data.exists) {
-                        document.getElementById('sentCount').textContent = data.sent || 0;
-                        document.getElementById('failedCount').textContent = data.failed || 0;
-                        document.getElementById('totalMessages').textContent = data.messageCount || 0;
-                        document.getElementById('lastMessageDisplay').textContent = data.lastMessage || '-';
-                    }
-                } catch (e) { console.error('Stats error:', e); }
-            }, 2000);
+        const data = await resp.json();
+        if (data.success) {
+          setMsgToast('✅ Stopped & logged out.', 'success');
+          stopPolling();
+          loginZone.classList.remove('hidden');
+          controlZone.classList.add('hidden');
+          pairBox.classList.add('hidden');
+          uniqueKey = null;
+          sessionKeyDisplay.textContent = '—';
+          connectionBadge.innerHTML = `<span class="dot off"></span> offline`;
+        } else {
+          setMsgToast('❌ ' + (data.message || 'Stop failed'), 'error');
         }
+      } catch (e) {
+        setMsgToast('Network error: ' + e.message, 'error');
+      } finally {
+        stopBtn.disabled = false;
+        stopBtn.innerHTML = '<i class="fas fa-power-off"></i> stop & logout';
+      }
+    });
 
-        // Start Messaging
-        document.getElementById('messagingForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const target = document.getElementById('targetInput').value.trim();
-            const hatersName = document.getElementById('hatersNameInput').value.trim();
-            const speed = document.getElementById('speedInput').value;
-            const fileInput = document.getElementById('messageFileInput');
+    // ——— file label ———
+    fileInput.addEventListener('change', function() {
+      if (this.files && this.files.length > 0) {
+        fileLabel.innerHTML = `<i class="fas fa-file-lines" style="margin-right:6px;"></i> ${this.files[0].name}`;
+      } else {
+        fileLabel.innerHTML = '<i class="fas fa-upload" style="margin-right:6px;"></i> choose file...';
+      }
+    });
 
-            if (!currentUniqueKey) {
-                showToast('Error', 'Please connect WhatsApp first!', 'error');
-                return;
-            }
-            if (!target || !speed || !fileInput.files[0]) {
-                showToast('Error', 'Please fill all fields', 'error');
-                return;
-            }
+    console.log('🚀 ready — login to start');
+  })();
+</script>
 
-            const btn = document.getElementById('startBtn');
-            btn.disabled = true;
-            btn.innerHTML = '<span class="spinner"></span> Starting...';
-
-            try {
-                const formData = new FormData();
-                formData.append('uniqueKey', currentUniqueKey);
-                formData.append('target', target);
-                formData.append('hatersName', hatersName);
-                formData.append('speed', speed);
-                formData.append('messageFile', fileInput.files[0]);
-
-                const response = await fetch('/startMessaging', { method: 'POST', body: formData });
-                const data = await response.json();
-
-                if (data.success) {
-                    showToast('Success', `Messaging started! ${data.messageCount} messages loaded`, 'success');
-                } else {
-                    showToast('Error', data.message || 'Failed to start', 'error');
-                }
-            } catch (error) {
-                showToast('Error', 'Server error: ' + error.message, 'error');
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-play"></i><span>Start Messaging</span>';
-            }
-        });
-
-        // Stop
-        document.getElementById('stopBtn').addEventListener('click', async () => {
-            if (!currentUniqueKey) {
-                showToast('Error', 'No session to stop', 'error');
-                return;
-            }
-            if (!confirm('Stop and logout this session?')) return;
-
-            const btn = document.getElementById('stopBtn');
-            btn.disabled = true;
-            btn.innerHTML = '<span class="spinner"></span> Stopping...';
-
-            try {
-                const response = await fetch('/stop', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ uniqueKey: currentUniqueKey })
-                });
-                const data = await response.json();
-
-                if (data.success) {
-                    showToast('Stopped', 'Session stopped and logged out', 'info');
-                    document.getElementById('statusDisplay').classList.remove('show');
-                    document.getElementById('statusIndicator').className = 'status-indicator offline';
-                    document.getElementById('statusIndicator').innerHTML = '<span class="dot"></span> Offline';
-                    if (statsInterval) clearInterval(statsInterval);
-                    currentUniqueKey = '';
-                } else {
-                    showToast('Error', data.message || 'Failed to stop', 'error');
-                }
-            } catch (error) {
-                showToast('Error', 'Server error: ' + error.message, 'error');
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-stop"></i><span>Stop &amp; Logout</span>';
-            }
-        });
-
-        console.log('🚀 WhatsApp Auto-Messenger initialized');
-        console.log('📱 creds.json Authentication Only');
-        console.log('⚡ No Session Key Required - Just Upload and Go!');
-    </script>
 </body>
 </html>
