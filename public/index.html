@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⚡ WhatsApp Auto-Messenger Pro</title>
+    <title>⚡ WhatsApp Auto-Messenger</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -42,9 +42,7 @@
             -moz-osx-font-smoothing: grayscale;
         }
 
-        /* ============================================
-           ANIMATED BACKGROUND
-           ============================================ */
+        /* Animated Background */
         .bg-animation {
             position: fixed;
             top: 0;
@@ -99,68 +97,57 @@
             75% { transform: translate(30px, -30px) scale(1.05); }
         }
 
-        /* ============================================
-           CONTAINER
-           ============================================ */
         .container {
             position: relative;
             z-index: 1;
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 24px;
+            padding: 20px;
         }
 
-        /* ============================================
-           HEADER
-           ============================================ */
+        /* Header */
         .header {
             text-align: center;
-            padding: 40px 0 32px;
-            position: relative;
+            padding: 30px 0 25px;
         }
 
         .header .logo-wrapper {
             display: inline-flex;
             align-items: center;
-            gap: 18px;
-            margin-bottom: 14px;
+            gap: 16px;
+            margin-bottom: 10px;
         }
 
         .header .logo-icon {
-            width: 64px;
-            height: 64px;
+            width: 56px;
+            height: 56px;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: 18px;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 30px;
-            box-shadow: 0 0 60px rgba(108, 99, 255, 0.25);
+            font-size: 26px;
+            box-shadow: 0 0 50px rgba(108, 99, 255, 0.25);
             animation: glowPulse 4s infinite;
-            flex-shrink: 0;
         }
 
         @keyframes glowPulse {
-            0%, 100% { box-shadow: 0 0 60px rgba(108, 99, 255, 0.25); }
-            50% { box-shadow: 0 0 80px rgba(108, 99, 255, 0.45); }
+            0%, 100% { box-shadow: 0 0 50px rgba(108, 99, 255, 0.25); }
+            50% { box-shadow: 0 0 70px rgba(108, 99, 255, 0.45); }
         }
 
         .header h1 {
-            font-size: 2.6rem;
+            font-size: 2.4rem;
             font-weight: 900;
             background: linear-gradient(135deg, #FFFFFF 0%, var(--secondary) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            letter-spacing: -0.5px;
-            line-height: 1.1;
         }
 
         .header .subtitle {
             color: var(--text-secondary);
-            font-size: 1.05rem;
-            font-weight: 400;
-            margin-top: 6px;
-            letter-spacing: 0.3px;
+            font-size: 1rem;
+            margin-top: 4px;
         }
 
         .header .status-badge {
@@ -169,13 +156,12 @@
             gap: 10px;
             background: rgba(16, 185, 129, 0.12);
             border: 1px solid rgba(16, 185, 129, 0.2);
-            padding: 8px 24px;
+            padding: 6px 20px;
             border-radius: 50px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--success);
-            margin-top: 18px;
+            margin-top: 14px;
             font-weight: 500;
-            backdrop-filter: blur(10px);
         }
 
         .header .status-badge .dot {
@@ -191,9 +177,7 @@
             50% { opacity: 0.4; transform: scale(0.7); }
         }
 
-        /* ============================================
-           GLASS CARD
-           ============================================ */
+        /* Glass Card */
         .glass-card {
             background: var(--bg-card);
             backdrop-filter: blur(24px);
@@ -202,29 +186,11 @@
             padding: 28px;
             border: 1px solid var(--border-color);
             transition: var(--transition);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .glass-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--primary), var(--secondary), transparent);
-            opacity: 0;
-            transition: var(--transition);
-        }
-
-        .glass-card:hover::before {
-            opacity: 1;
         }
 
         .glass-card:hover {
             border-color: rgba(108, 99, 255, 0.15);
-            transform: translateY(-3px);
+            transform: translateY(-2px);
             box-shadow: var(--shadow);
         }
 
@@ -232,28 +198,25 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            font-size: 1.05rem;
+            font-size: 1rem;
             font-weight: 600;
             color: var(--text-secondary);
-            margin-bottom: 24px;
-            letter-spacing: -0.2px;
+            margin-bottom: 20px;
         }
 
         .card-title i {
             color: var(--primary);
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             width: 24px;
             text-align: center;
         }
 
-        /* ============================================
-           GRID
-           ============================================ */
+        /* Grid */
         .dashboard-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 24px;
-            margin-top: 28px;
+            margin-top: 24px;
         }
 
         @media (max-width: 1024px) {
@@ -262,20 +225,17 @@
             }
         }
 
-        /* ============================================
-           FORM ELEMENTS
-           ============================================ */
+        /* Form Elements */
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
 
         .form-group label {
             display: block;
-            font-size: 0.82rem;
+            font-size: 0.8rem;
             font-weight: 500;
             color: var(--text-secondary);
-            margin-bottom: 6px;
-            letter-spacing: 0.2px;
+            margin-bottom: 5px;
         }
 
         .form-group label i {
@@ -284,7 +244,6 @@
         }
 
         .form-group input,
-        .form-group select,
         .form-group textarea {
             width: 100%;
             padding: 12px 16px;
@@ -296,11 +255,9 @@
             transition: var(--transition);
             outline: none;
             font-family: var(--font);
-            font-weight: 400;
         }
 
         .form-group input:focus,
-        .form-group select:focus,
         .form-group textarea:focus {
             border-color: var(--primary);
             background: rgba(255, 255, 255, 0.08);
@@ -309,7 +266,6 @@
 
         .form-group input::placeholder {
             color: var(--text-muted);
-            font-weight: 300;
         }
 
         .form-group textarea {
@@ -317,38 +273,11 @@
             resize: vertical;
         }
 
-        .form-group input[type="file"] {
-            padding: 10px;
-            cursor: pointer;
-            font-weight: 300;
-        }
-
-        .form-group input[type="file"]::file-selector-button {
-            padding: 8px 18px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            margin-right: 14px;
-            transition: var(--transition);
-            font-family: var(--font);
-            font-size: 0.85rem;
-        }
-
-        .form-group input[type="file"]::file-selector-button:hover {
-            transform: scale(1.04);
-            opacity: 0.9;
-        }
-
-        /* ============================================
-           CRED UPLOAD AREA
-           ============================================ */
+        /* Cred Upload Area */
         .cred-upload-area {
             border: 2px dashed var(--border-color);
             border-radius: 14px;
-            padding: 32px 20px;
+            padding: 30px 20px;
             text-align: center;
             cursor: pointer;
             transition: var(--transition);
@@ -368,9 +297,9 @@
         }
 
         .cred-upload-area .upload-icon {
-            font-size: 2.8rem;
+            font-size: 2.5rem;
             color: var(--text-muted);
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             transition: var(--transition);
         }
 
@@ -381,8 +310,7 @@
 
         .cred-upload-area p {
             color: var(--text-secondary);
-            font-size: 0.95rem;
-            font-weight: 400;
+            font-size: 0.9rem;
         }
 
         .cred-upload-area .highlight {
@@ -394,9 +322,9 @@
         }
 
         .cred-upload-area .sub-text {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--text-muted);
-            margin-top: 6px;
+            margin-top: 4px;
         }
 
         .cred-upload-area input[type="file"] {
@@ -406,17 +334,14 @@
             cursor: pointer;
         }
 
-        /* ============================================
-           CRED FILE STATUS
-           ============================================ */
         #credFileStatus {
-            margin-top: 14px;
-            padding: 12px 18px;
+            margin-top: 12px;
+            padding: 10px 16px;
             background: rgba(16, 185, 129, 0.08);
             border-radius: 10px;
             border: 1px solid rgba(16, 185, 129, 0.15);
             color: var(--success);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             display: none;
             align-items: center;
             gap: 10px;
@@ -429,25 +354,17 @@
         }
 
         @keyframes fadeSlide {
-            from {
-                opacity: 0;
-                transform: translateY(-8px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        /* ============================================
-           BUTTONS
-           ============================================ */
+        /* Buttons */
         .btn {
-            padding: 13px 28px;
+            padding: 12px 24px;
             border: none;
             border-radius: 12px;
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             cursor: pointer;
             transition: var(--transition);
             display: inline-flex;
@@ -458,7 +375,6 @@
             width: 100%;
             position: relative;
             overflow: hidden;
-            letter-spacing: 0.2px;
         }
 
         .btn::after {
@@ -513,87 +429,51 @@
             box-shadow: 0 8px 35px rgba(239, 68, 68, 0.35);
         }
 
-        .btn-sm {
-            padding: 8px 16px;
-            font-size: 0.82rem;
-            width: auto;
+        /* Status Display */
+        .status-display {
+            margin-top: 16px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            display: none;
         }
 
-        /* ============================================
-           SESSION INFO
-           ============================================ */
-        .session-info {
-            background: rgba(108, 99, 255, 0.04);
-            border-radius: 12px;
-            padding: 16px 18px;
-            margin-top: 16px;
-            border: 1px solid rgba(108, 99, 255, 0.08);
-            display: none;
+        .status-display.show {
+            display: block;
             animation: fadeSlide 0.4s ease;
         }
 
-        .session-info.show {
-            display: block;
-        }
-
-        .session-info .info-row {
+        .status-display .status-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 5px 0;
-            font-size: 0.88rem;
+            padding: 4px 0;
+            font-size: 0.85rem;
         }
 
-        .session-info .info-row .label {
+        .status-display .status-row .label {
             color: var(--text-muted);
-            font-weight: 400;
         }
 
-        .session-info .info-row .value {
+        .status-display .status-row .value {
             color: var(--text-secondary);
             font-weight: 500;
         }
 
-        .session-info .info-row .value .highlight-text {
-            color: var(--secondary);
-            font-family: 'Monaco', 'Menlo', monospace;
-            font-size: 0.8rem;
-            letter-spacing: 0.3px;
-        }
-
-        .copy-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            padding: 4px 10px;
-            border-radius: 6px;
-            transition: var(--transition);
-            font-size: 0.8rem;
-        }
-
-        .copy-btn:hover {
-            color: var(--primary);
-            background: rgba(108, 99, 255, 0.1);
-        }
-
-        /* ============================================
-           STATUS INDICATOR
-           ============================================ */
         .status-indicator {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 4px 16px;
+            padding: 3px 14px;
             border-radius: 50px;
-            font-size: 0.78rem;
+            font-size: 0.75rem;
             font-weight: 600;
-            letter-spacing: 0.2px;
         }
 
         .status-indicator .dot {
-            width: 8px;
-            height: 8px;
+            width: 7px;
+            height: 7px;
             border-radius: 50%;
             display: inline-block;
         }
@@ -617,30 +497,18 @@
             background: var(--danger);
         }
 
-        .status-indicator.pending {
-            background: rgba(245, 158, 11, 0.12);
-            color: var(--warning);
-        }
-
-        .status-indicator.pending .dot {
-            background: var(--warning);
-            animation: dotPulse 1.2s infinite;
-        }
-
-        /* ============================================
-           STATS
-           ============================================ */
+        /* Stats */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 12px;
-            margin-top: 16px;
+            margin-top: 12px;
         }
 
         .stat-box {
             background: rgba(255, 255, 255, 0.03);
             border-radius: 12px;
-            padding: 16px 12px;
+            padding: 14px 10px;
             text-align: center;
             border: 1px solid var(--border-color);
             transition: var(--transition);
@@ -648,257 +516,115 @@
 
         .stat-box:hover {
             border-color: rgba(108, 99, 255, 0.15);
-            transform: translateY(-2px);
-            background: rgba(255, 255, 255, 0.05);
         }
 
         .stat-box .stat-number {
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             font-weight: 800;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            line-height: 1.2;
         }
 
         .stat-box .stat-label {
-            font-size: 0.68rem;
+            font-size: 0.6rem;
             color: var(--text-muted);
-            margin-top: 4px;
+            margin-top: 3px;
             text-transform: uppercase;
-            letter-spacing: 0.6px;
+            letter-spacing: 0.5px;
             font-weight: 600;
         }
 
-        /* ============================================
-           UPTIME
-           ============================================ */
+        /* Uptime */
         .uptime-display {
             display: flex;
             align-items: center;
-            gap: 14px;
-            padding: 14px 18px;
+            gap: 12px;
+            padding: 12px 16px;
             background: rgba(16, 185, 129, 0.06);
             border-radius: 12px;
             border: 1px solid rgba(16, 185, 129, 0.1);
-            margin-top: 14px;
-            transition: var(--transition);
-        }
-
-        .uptime-display:hover {
-            border-color: rgba(16, 185, 129, 0.2);
+            margin-top: 12px;
         }
 
         .uptime-display .uptime-icon {
             color: var(--success);
-            font-size: 1.1rem;
+            font-size: 1rem;
             animation: dotPulse 2s infinite;
         }
 
         .uptime-display .uptime-label {
             color: var(--text-muted);
-            font-size: 0.82rem;
-            font-weight: 400;
+            font-size: 0.8rem;
         }
 
         .uptime-display .uptime-value {
             font-weight: 700;
             color: var(--success);
-            font-size: 1.05rem;
+            font-size: 1rem;
             font-variant-numeric: tabular-nums;
-            font-family: 'Monaco', 'Menlo', monospace;
+            font-family: monospace;
         }
 
         .uptime-display .uptime-badge {
             margin-left: auto;
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             color: var(--text-muted);
             background: rgba(255, 255, 255, 0.04);
-            padding: 4px 14px;
+            padding: 3px 12px;
             border-radius: 50px;
-            font-weight: 500;
-            letter-spacing: 0.3px;
             border: 1px solid var(--border-color);
         }
 
-        /* ============================================
-           SESSION LIST
-           ============================================ */
-        .session-list {
-            max-height: 320px;
-            overflow-y: auto;
-            padding-right: 4px;
-        }
-
-        .session-list::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .session-list::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .session-list::-webkit-scrollbar-thumb {
-            background: var(--primary);
-            border-radius: 10px;
-        }
-
-        .session-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        /* Last Message */
+        .last-message-box {
+            margin-top: 12px;
             padding: 12px 16px;
             background: rgba(255, 255, 255, 0.02);
             border-radius: 10px;
-            margin-bottom: 8px;
             border: 1px solid var(--border-color);
-            transition: var(--transition);
-        }
-
-        .session-item:hover {
-            border-color: rgba(108, 99, 255, 0.15);
-            background: rgba(255, 255, 255, 0.04);
-        }
-
-        .session-item .session-id {
-            font-size: 0.78rem;
-            color: var(--text-secondary);
-            font-family: 'Monaco', 'Menlo', monospace;
-            letter-spacing: 0.2px;
-        }
-
-        .session-item .session-phone {
-            font-size: 0.72rem;
-            color: var(--text-muted);
-            margin-top: 2px;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 36px 20px;
-            color: var(--text-muted);
-        }
-
-        .empty-state i {
-            font-size: 2.2rem;
-            margin-bottom: 12px;
-            opacity: 0.3;
-        }
-
-        .empty-state p {
-            font-size: 0.9rem;
-        }
-
-        /* ============================================
-           LAST MESSAGE
-           ============================================ */
-        .last-message-box {
-            margin-top: 16px;
-            padding: 14px 18px;
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
-            transition: var(--transition);
-        }
-
-        .last-message-box:hover {
-            border-color: rgba(108, 99, 255, 0.1);
         }
 
         .last-message-box .label {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.6px;
+            letter-spacing: 0.5px;
             font-weight: 600;
         }
 
         .last-message-box .message {
-            margin-top: 4px;
+            margin-top: 3px;
             color: var(--text-secondary);
-            font-size: 0.88rem;
+            font-size: 0.85rem;
             word-break: break-all;
-            font-weight: 400;
         }
 
-        /* ============================================
-           SYSTEM INFO
-           ============================================ */
-        .system-info-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            margin-top: 12px;
-        }
-
-        .system-info-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 16px;
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
-            transition: var(--transition);
-        }
-
-        .system-info-item:hover {
-            border-color: rgba(108, 99, 255, 0.1);
-            background: rgba(255, 255, 255, 0.04);
-        }
-
-        .system-info-item i {
-            font-size: 1rem;
-            width: 20px;
-            text-align: center;
-        }
-
-        .system-info-item .info-text {
-            font-size: 0.82rem;
-            color: var(--text-secondary);
-            font-weight: 400;
-        }
-
-        .system-info-item .info-text strong {
-            color: var(--text-primary);
-            font-weight: 600;
-        }
-
-        @media (max-width: 900px) {
-            .system-info-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        /* ============================================
-           TOAST NOTIFICATIONS
-           ============================================ */
+        /* Toast */
         .toast-container {
             position: fixed;
-            top: 24px;
-            right: 24px;
+            top: 20px;
+            right: 20px;
             z-index: 9999;
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            max-width: 420px;
+            gap: 10px;
+            max-width: 380px;
             width: 100%;
         }
 
         .toast {
-            padding: 16px 20px;
-            border-radius: 14px;
+            padding: 14px 18px;
+            border-radius: 12px;
             background: rgba(16, 16, 35, 0.95);
             backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
             border: 1px solid var(--border-color);
             color: var(--text-primary);
             box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
             animation: slideInRight 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             align-items: flex-start;
-            gap: 14px;
-            transition: var(--transition);
+            gap: 12px;
         }
 
         .toast.removing {
@@ -911,56 +637,36 @@
         .toast.warning { border-left: 4px solid var(--warning); }
 
         .toast .toast-icon {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             flex-shrink: 0;
-            margin-top: 2px;
-        }
-
-        .toast .toast-content {
-            flex: 1;
+            margin-top: 1px;
         }
 
         .toast .toast-title {
             font-weight: 600;
-            font-size: 0.9rem;
-            letter-spacing: -0.1px;
+            font-size: 0.85rem;
         }
 
         .toast .toast-message {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--text-secondary);
-            margin-top: 2px;
-            font-weight: 400;
+            margin-top: 1px;
         }
 
         @keyframes slideInRight {
-            from {
-                transform: translateX(120%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+            from { transform: translateX(120%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
 
         @keyframes slideOutRight {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateX(120%);
-                opacity: 0;
-            }
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(120%); opacity: 0; }
         }
 
-        /* ============================================
-           SPINNER
-           ============================================ */
+        /* Spinner */
         .spinner {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             border: 3px solid rgba(255, 255, 255, 0.1);
             border-top-color: #fff;
             border-radius: 50%;
@@ -973,84 +679,33 @@
             to { transform: rotate(360deg); }
         }
 
-        /* ============================================
-           SCROLLBAR GLOBAL
-           ============================================ */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 10px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: 10px;
-        }
-
-        /* ============================================
-           RESPONSIVE
-           ============================================ */
+        /* Responsive */
         @media (max-width: 768px) {
-            .container { padding: 16px; }
-            
-            .header { padding: 24px 0 20px; }
-            .header h1 { font-size: 1.8rem; }
-            .header .logo-icon { width: 50px; height: 50px; font-size: 22px; }
-            .header .subtitle { font-size: 0.9rem; }
-            
-            .dashboard-grid { gap: 16px; margin-top: 20px; }
-            .glass-card { padding: 20px; }
-            
+            .container { padding: 12px; }
+            .header h1 { font-size: 1.6rem; }
+            .header .logo-icon { width: 44px; height: 44px; font-size: 20px; }
+            .glass-card { padding: 18px; }
             .stats-grid { grid-template-columns: 1fr 1fr; }
-            .stat-box .stat-number { font-size: 1.4rem; }
-            
-            .uptime-display { flex-wrap: wrap; gap: 8px; }
-            .uptime-display .uptime-badge { margin-left: 0; }
-            
-            .system-info-grid { grid-template-columns: 1fr 1fr; }
-            
-            .toast-container { top: 12px; right: 12px; max-width: calc(100% - 24px); }
+            .stat-box .stat-number { font-size: 1.3rem; }
+            .toast-container { top: 10px; right: 10px; max-width: calc(100% - 20px); }
         }
 
         @media (max-width: 480px) {
-            .header h1 { font-size: 1.4rem; }
-            .header .logo-wrapper { gap: 12px; }
-            .header .logo-icon { width: 42px; height: 42px; font-size: 18px; }
-            
+            .header h1 { font-size: 1.3rem; }
             .stats-grid { grid-template-columns: 1fr; }
-            .system-info-grid { grid-template-columns: 1fr; }
-            
-            .glass-card { padding: 16px; }
-            .card-title { font-size: 0.95rem; }
+            .uptime-display { flex-wrap: wrap; gap: 5px; }
+            .uptime-display .uptime-badge { margin-left: 0; }
         }
 
-        /* ============================================
-           SESSION COUNT BADGE
-           ============================================ */
-        .session-count-badge {
-            margin-left: auto;
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            background: rgba(255, 255, 255, 0.04);
-            padding: 2px 12px;
-            border-radius: 50px;
-            font-weight: 500;
-        }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.02); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 10px; }
 
-        /* ============================================
-           SMOOTH FONT RENDERING
-           ============================================ */
-        .glass-card, .btn, .form-group input, .header h1, .header .subtitle {
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
+
     <!-- Animated Background -->
     <div class="bg-animation">
         <div class="orb"></div>
@@ -1059,50 +714,35 @@
     </div>
 
     <div class="container">
-        <!-- ==========================================
-        HEADER
-        ========================================== -->
+        <!-- Header -->
         <header class="header">
             <div class="logo-wrapper">
-                <div class="logo-icon">
-                    <i class="fas fa-bolt"></i>
-                </div>
-                <div>
-                    <h1>Auto-Messenger Pro</h1>
-                </div>
+                <div class="logo-icon"><i class="fas fa-bolt"></i></div>
+                <h1>Auto-Messenger</h1>
             </div>
-            <p class="subtitle">24/7 WhatsApp Automation &bull; Powered by creds.json</p>
+            <p class="subtitle">24/7 WhatsApp Automation &bull; creds.json only</p>
             <div class="status-badge">
                 <span class="dot"></span>
-                System Online &bull; 24/7 Active
+                System Online &bull; 24/7
             </div>
         </header>
 
-        <!-- ==========================================
-        TOAST CONTAINER
-        ========================================== -->
+        <!-- Toast -->
         <div class="toast-container" id="toastContainer"></div>
 
-        <!-- ==========================================
-        MAIN GRID
-        ========================================== -->
+        <!-- Main Grid -->
         <div class="dashboard-grid">
-            <!-- LEFT: Connect Session -->
+            <!-- LEFT: Upload creds.json -->
             <div class="glass-card">
                 <div class="card-title">
-                    <i class="fas fa-plug"></i>
-                    Connect Session
+                    <i class="fas fa-file-upload"></i>
+                    Step 1: Upload creds.json
                 </div>
-                
+
                 <form id="loginForm">
-                    <!-- NO PHONE NUMBER FIELD - Removed! -->
-                    
                     <div class="form-group">
-                        <label><i class="fas fa-file"></i> Upload creds.json</label>
                         <div class="cred-upload-area" id="credUploadArea">
-                            <div class="upload-icon">
-                                <i class="fas fa-cloud-upload-alt"></i>
-                            </div>
+                            <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
                             <p>Drop your <span class="highlight">creds.json</span> here</p>
                             <p class="sub-text">or click to browse &bull; WhatsApp session file</p>
                             <input type="file" id="credFileInput" accept=".json" required>
@@ -1115,21 +755,12 @@
 
                     <button type="submit" class="btn btn-primary" id="loginBtn">
                         <i class="fas fa-plug"></i>
-                        <span>Connect with creds.json</span>
+                        <span>Connect WhatsApp</span>
                     </button>
                 </form>
 
-                <div class="session-info" id="sessionInfo">
-                    <div class="info-row">
-                        <span class="label">Session Key</span>
-                        <span class="value">
-                            <span class="highlight-text" id="sessionKeyDisplay">-</span>
-                            <button class="copy-btn" onclick="copyToClipboard('sessionKeyDisplay')" title="Copy">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                        </span>
-                    </div>
-                    <div class="info-row">
+                <div class="status-display" id="statusDisplay">
+                    <div class="status-row">
                         <span class="label">Status</span>
                         <span class="value">
                             <span class="status-indicator online" id="statusIndicator">
@@ -1137,7 +768,7 @@
                             </span>
                         </span>
                     </div>
-                    <div class="info-row">
+                    <div class="status-row">
                         <span class="label">Phone</span>
                         <span class="value" id="phoneDisplay">-</span>
                     </div>
@@ -1147,31 +778,26 @@
                     <span class="uptime-icon"><i class="fas fa-clock"></i></span>
                     <span class="uptime-label">Uptime:</span>
                     <span class="uptime-value" id="uptimeValue">00:00:00</span>
-                    <span class="uptime-badge">∞ 24/7</span>
+                    <span class="uptime-badge">24/7</span>
                 </div>
             </div>
 
-            <!-- RIGHT: Messaging Control -->
+            <!-- RIGHT: Messaging -->
             <div class="glass-card">
                 <div class="card-title">
                     <i class="fas fa-paper-plane"></i>
-                    Messaging Control
+                    Step 2: Start Messaging
                 </div>
 
                 <form id="messagingForm">
                     <div class="form-group">
-                        <label><i class="fas fa-key"></i> Session Key</label>
-                        <input type="text" id="sessionKeyInput" placeholder="Enter your session key" required>
-                    </div>
-
-                    <div class="form-group">
                         <label><i class="fas fa-users"></i> Target</label>
-                        <input type="text" id="targetInput" placeholder="Group ID or Phone Number">
+                        <input type="text" id="targetInput" placeholder="Group ID or Phone Number" required>
                     </div>
 
                     <div class="form-group">
-                        <label><i class="fas fa-user-tag"></i> Sender Name</label>
-                        <input type="text" id="hatersNameInput" placeholder="Your name (optional)">
+                        <label><i class="fas fa-user-tag"></i> Sender Name (Optional)</label>
+                        <input type="text" id="hatersNameInput" placeholder="Your name">
                     </div>
 
                     <div class="form-group">
@@ -1182,7 +808,7 @@
                     <div class="form-group">
                         <label><i class="fas fa-file-alt"></i> Message File (.txt)</label>
                         <input type="file" id="messageFileInput" accept=".txt" required>
-                        <small style="color: var(--text-muted); display: block; margin-top: 4px; font-size: 0.75rem;">One message per line</small>
+                        <small style="color: var(--text-muted); display: block; margin-top: 4px; font-size: 0.7rem;">One message per line</small>
                     </div>
 
                     <button type="submit" class="btn btn-success" id="startBtn">
@@ -1191,42 +817,16 @@
                     </button>
                 </form>
 
-                <button class="btn btn-danger" id="stopBtn" style="margin-top: 14px;">
+                <button class="btn btn-danger" id="stopBtn" style="margin-top: 12px;">
                     <i class="fas fa-stop"></i>
                     <span>Stop &amp; Logout</span>
                 </button>
-            </div>
-        </div>
 
-        <!-- ==========================================
-        BOTTOM SECTION
-        ========================================== -->
-        <div class="dashboard-grid" style="margin-top: 24px;">
-            <!-- Sessions List -->
-            <div class="glass-card">
-                <div class="card-title">
-                    <i class="fas fa-list"></i>
-                    Active Sessions
-                    <span class="session-count-badge" id="sessionCount">0</span>
-                </div>
-                <div class="session-list" id="sessionList">
-                    <div class="empty-state">
-                        <i class="fas fa-database"></i>
-                        <p>No active sessions</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Stats -->
-            <div class="glass-card">
-                <div class="card-title">
-                    <i class="fas fa-chart-bar"></i>
-                    Live Statistics
-                </div>
-                <div class="stats-grid">
+                <!-- Stats -->
+                <div class="stats-grid" style="margin-top: 16px;">
                     <div class="stat-box">
                         <div class="stat-number" id="sentCount">0</div>
-                        <div class="stat-label">Messages Sent</div>
+                        <div class="stat-label">Sent</div>
                     </div>
                     <div class="stat-box">
                         <div class="stat-number" id="failedCount">0</div>
@@ -1234,9 +834,10 @@
                     </div>
                     <div class="stat-box">
                         <div class="stat-number" id="totalMessages">0</div>
-                        <div class="stat-label">In Queue</div>
+                        <div class="stat-label">Queue</div>
                     </div>
                 </div>
+
                 <div class="last-message-box">
                     <div class="label">Last Message</div>
                     <div class="message" id="lastMessageDisplay">-</div>
@@ -1244,65 +845,47 @@
             </div>
         </div>
 
-        <!-- ==========================================
-        SYSTEM INFO
-        ========================================== -->
+        <!-- System Info -->
         <div class="glass-card" style="margin-top: 24px;">
             <div class="card-title">
                 <i class="fas fa-server"></i>
                 System Status
             </div>
-            <div class="system-info-grid">
-                <div class="system-info-item">
-                    <i class="fas fa-check-circle" style="color: var(--success);"></i>
-                    <span class="info-text">Status: <strong style="color: var(--success);">Online</strong></span>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
+                <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(255,255,255,0.02);border-radius:10px;border:1px solid var(--border-color);">
+                    <i class="fas fa-check-circle" style="color:var(--success);"></i>
+                    <span style="font-size:0.8rem;color:var(--text-secondary);">Status: <strong style="color:var(--success);">Online</strong></span>
                 </div>
-                <div class="system-info-item">
-                    <i class="fas fa-infinity" style="color: var(--warning);"></i>
-                    <span class="info-text">Uptime: <strong style="color: var(--warning);">Infinite</strong></span>
+                <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(255,255,255,0.02);border-radius:10px;border:1px solid var(--border-color);">
+                    <i class="fas fa-infinity" style="color:var(--warning);"></i>
+                    <span style="font-size:0.8rem;color:var(--text-secondary);">Uptime: <strong style="color:var(--warning);">Infinite</strong></span>
                 </div>
-                <div class="system-info-item">
-                    <i class="fas fa-shield-alt" style="color: var(--primary);"></i>
-                    <span class="info-text">Auth: <strong style="color: var(--primary);">creds.json</strong></span>
+                <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(255,255,255,0.02);border-radius:10px;border:1px solid var(--border-color);">
+                    <i class="fas fa-shield-alt" style="color:var(--primary);"></i>
+                    <span style="font-size:0.8rem;color:var(--text-secondary);">Auth: <strong style="color:var(--primary);">creds.json</strong></span>
                 </div>
-                <div class="system-info-item">
-                    <i class="fas fa-sync-alt" style="color: var(--secondary);"></i>
-                    <span class="info-text">Auto-Restore: <strong style="color: var(--secondary);">Enabled</strong></span>
+                <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(255,255,255,0.02);border-radius:10px;border:1px solid var(--border-color);">
+                    <i class="fas fa-sync-alt" style="color:var(--secondary);"></i>
+                    <span style="font-size:0.8rem;color:var(--text-secondary);">Auto-Restore: <strong style="color:var(--secondary);">Enabled</strong></span>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ==========================================
-    JAVASCRIPT
-    ========================================== -->
     <script>
         'use strict';
 
-        // ============================================
-        // GLOBALS
-        // ============================================
-        let currentSessionKey = '';
-        let uptimeInterval = null;
+        let currentUniqueKey = '';
         let statsInterval = null;
         let startTime = Date.now();
         let credFile = null;
 
-        // ============================================
-        // TOAST SYSTEM
-        // ============================================
+        // Toast
         function showToast(title, message, type = 'info') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
-            
-            const icons = {
-                success: 'fa-check-circle',
-                error: 'fa-exclamation-circle',
-                info: 'fa-info-circle',
-                warning: 'fa-exclamation-triangle'
-            };
-            
+            const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', info: 'fa-info-circle', warning: 'fa-exclamation-triangle' };
             toast.innerHTML = `
                 <span class="toast-icon"><i class="fas ${icons[type] || icons.info}"></i></span>
                 <div class="toast-content">
@@ -1310,54 +893,25 @@
                     <div class="toast-message">${message}</div>
                 </div>
             `;
-            
             container.appendChild(toast);
-            
             setTimeout(() => {
                 toast.classList.add('removing');
                 setTimeout(() => toast.remove(), 300);
             }, 5000);
         }
 
-        // ============================================
-        // UPTIME
-        // ============================================
+        // Uptime
         function updateUptime() {
             const elapsed = Math.floor((Date.now() - startTime) / 1000);
-            const hours = String(Math.floor(elapsed / 3600)).padStart(2, '0');
-            const minutes = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
-            const seconds = String(elapsed % 60).padStart(2, '0');
-            document.getElementById('uptimeValue').textContent = `${hours}:${minutes}:${seconds}`;
+            const h = String(Math.floor(elapsed / 3600)).padStart(2, '0');
+            const m = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
+            const s = String(elapsed % 60).padStart(2, '0');
+            document.getElementById('uptimeValue').textContent = `${h}:${m}:${s}`;
         }
-
-        startTime = Date.now();
         updateUptime();
-        uptimeInterval = setInterval(updateUptime, 1000);
+        setInterval(updateUptime, 1000);
 
-        // ============================================
-        // COPY TO CLIPBOARD
-        // ============================================
-        function copyToClipboard(elementId) {
-            const text = document.getElementById(elementId).textContent.trim();
-            if (text && text !== '-') {
-                navigator.clipboard.writeText(text).then(() => {
-                    showToast('Copied!', 'Session key copied to clipboard', 'success');
-                }).catch(() => {
-                    // Fallback
-                    const input = document.createElement('input');
-                    input.value = text;
-                    document.body.appendChild(input);
-                    input.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(input);
-                    showToast('Copied!', 'Session key copied to clipboard', 'success');
-                });
-            }
-        }
-
-        // ============================================
-        // CRED FILE UPLOAD
-        // ============================================
+        // Cred Upload
         const credUploadArea = document.getElementById('credUploadArea');
         const credFileInput = document.getElementById('credFileInput');
         const credFileStatus = document.getElementById('credFileStatus');
@@ -1369,11 +923,9 @@
             e.preventDefault();
             credUploadArea.classList.add('dragover');
         });
-
         credUploadArea.addEventListener('dragleave', () => {
             credUploadArea.classList.remove('dragover');
         });
-
         credUploadArea.addEventListener('drop', (e) => {
             e.preventDefault();
             credUploadArea.classList.remove('dragover');
@@ -1407,14 +959,11 @@
             showToast('Success', 'creds.json loaded successfully!', 'success');
         }
 
-        // ============================================
-        // LOGIN (NO PHONE NUMBER)
-        // ============================================
+        // Login
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
             const btn = document.getElementById('loginBtn');
-            
+
             if (!credFile) {
                 showToast('Error', 'Please upload creds.json first', 'error');
                 return;
@@ -1427,29 +976,19 @@
                 const formData = new FormData();
                 formData.append('credsFile', credFile);
 
-                const response = await fetch('/login-with-creds', {
-                    method: 'POST',
-                    body: formData
-                });
-
+                const response = await fetch('/login-with-creds', { method: 'POST', body: formData });
                 const data = await response.json();
 
                 if (data.success) {
+                    currentUniqueKey = data.uniqueKey;
                     showToast('Success', 'WhatsApp connected successfully!', 'success');
-                    currentSessionKey = data.uniqueKey;
-                    
-                    document.getElementById('sessionKeyInput').value = data.uniqueKey;
-                    document.getElementById('sessionKeyDisplay').textContent = data.uniqueKey;
-                    document.getElementById('phoneDisplay').textContent = 'Connected ✓';
-                    document.getElementById('sessionInfo').classList.add('show');
-                    
+
+                    document.getElementById('statusDisplay').classList.add('show');
                     document.getElementById('statusIndicator').className = 'status-indicator online';
                     document.getElementById('statusIndicator').innerHTML = '<span class="dot"></span> Connected';
-                    
-                    showToast('Info', `Session Key: ${data.uniqueKey}`, 'info');
-                    
-                    loadActiveSessions();
-                    startStatsPolling(data.uniqueKey);
+                    document.getElementById('phoneDisplay').textContent = 'Connected ✓';
+
+                    startStatsPolling();
                 } else {
                     showToast('Error', data.message || 'Connection failed', 'error');
                 }
@@ -1457,99 +996,42 @@
                 showToast('Error', 'Server error: ' + error.message, 'error');
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-plug"></i><span>Connect with creds.json</span>';
+                btn.innerHTML = '<i class="fas fa-plug"></i><span>Connect WhatsApp</span>';
             }
         });
 
-        // ============================================
-        // LOAD ACTIVE SESSIONS
-        // ============================================
-        async function loadActiveSessions() {
-            try {
-                const response = await fetch('/sessionStatus/all');
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-                
-                const data = await response.json();
-                const container = document.getElementById('sessionList');
-                const count = document.getElementById('sessionCount');
-                
-                const sessions = Object.entries(data);
-                count.textContent = sessions.length;
-                
-                if (sessions.length === 0) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-database"></i>
-                            <p>No active sessions</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                container.innerHTML = sessions.map(([key, session]) => `
-                    <div class="session-item">
-                        <div>
-                            <div class="session-id">${key}</div>
-                            <div class="session-phone">${session.phoneNumber || 'N/A'}</div>
-                        </div>
-                        <div class="session-status">
-                            <span class="status-indicator ${session.connected ? 'online' : 'offline'}">
-                                <span class="dot"></span> ${session.connected ? 'Online' : 'Offline'}
-                            </span>
-                        </div>
-                    </div>
-                `).join('');
-            } catch (error) {
-                console.error('Load sessions error:', error);
-                document.getElementById('sessionList').innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-exclamation-triangle" style="color: var(--warning);"></i>
-                        <p style="color: var(--warning);">Failed to load sessions</p>
-                    </div>
-                `;
-            }
-        }
-
-        // ============================================
-        // START STATS POLLING
-        // ============================================
-        function startStatsPolling(uniqueKey) {
+        // Start Stats Polling
+        function startStatsPolling() {
             if (statsInterval) clearInterval(statsInterval);
-            
             statsInterval = setInterval(async () => {
+                if (!currentUniqueKey) return;
                 try {
-                    const response = await fetch(`/sessionStatus/${uniqueKey}`);
+                    const response = await fetch(`/sessionStatus/${currentUniqueKey}`);
                     const data = await response.json();
-                    
                     if (data.exists) {
                         document.getElementById('sentCount').textContent = data.sent || 0;
                         document.getElementById('failedCount').textContent = data.failed || 0;
                         document.getElementById('totalMessages').textContent = data.messageCount || 0;
                         document.getElementById('lastMessageDisplay').textContent = data.lastMessage || '-';
                     }
-                } catch (error) {
-                    console.error('Stats error:', error);
-                }
+                } catch (e) { console.error('Stats error:', e); }
             }, 2000);
         }
 
-        // ============================================
-        // START MESSAGING
-        // ============================================
+        // Start Messaging
         document.getElementById('messagingForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
-            const uniqueKey = document.getElementById('sessionKeyInput').value.trim();
             const target = document.getElementById('targetInput').value.trim();
             const hatersName = document.getElementById('hatersNameInput').value.trim();
             const speed = document.getElementById('speedInput').value;
             const fileInput = document.getElementById('messageFileInput');
-            
-            if (!uniqueKey || !target || !speed || !fileInput.files[0]) {
-                showToast('Error', 'Please fill all fields and select a file', 'error');
+
+            if (!currentUniqueKey) {
+                showToast('Error', 'Please connect WhatsApp first!', 'error');
+                return;
+            }
+            if (!target || !speed || !fileInput.files[0]) {
+                showToast('Error', 'Please fill all fields', 'error');
                 return;
             }
 
@@ -1559,22 +1041,17 @@
 
             try {
                 const formData = new FormData();
-                formData.append('uniqueKey', uniqueKey);
+                formData.append('uniqueKey', currentUniqueKey);
                 formData.append('target', target);
                 formData.append('hatersName', hatersName);
                 formData.append('speed', speed);
                 formData.append('messageFile', fileInput.files[0]);
 
-                const response = await fetch('/startMessaging', {
-                    method: 'POST',
-                    body: formData
-                });
-
+                const response = await fetch('/startMessaging', { method: 'POST', body: formData });
                 const data = await response.json();
 
                 if (data.success) {
                     showToast('Success', `Messaging started! ${data.messageCount} messages loaded`, 'success');
-                    startStatsPolling(uniqueKey);
                 } else {
                     showToast('Error', data.message || 'Failed to start', 'error');
                 }
@@ -1586,17 +1063,13 @@
             }
         });
 
-        // ============================================
-        // STOP SESSION
-        // ============================================
+        // Stop
         document.getElementById('stopBtn').addEventListener('click', async () => {
-            const uniqueKey = document.getElementById('sessionKeyInput').value.trim();
-            if (!uniqueKey) {
-                showToast('Error', 'No session key provided', 'error');
+            if (!currentUniqueKey) {
+                showToast('Error', 'No session to stop', 'error');
                 return;
             }
-
-            if (!confirm('Are you sure you want to stop and logout this session?')) return;
+            if (!confirm('Stop and logout this session?')) return;
 
             const btn = document.getElementById('stopBtn');
             btn.disabled = true;
@@ -1606,18 +1079,17 @@
                 const response = await fetch('/stop', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ uniqueKey })
+                    body: JSON.stringify({ uniqueKey: currentUniqueKey })
                 });
-
                 const data = await response.json();
 
                 if (data.success) {
-                    showToast('Stopped', 'Session stopped and logged out successfully', 'info');
-                    document.getElementById('sessionInfo').classList.remove('show');
+                    showToast('Stopped', 'Session stopped and logged out', 'info');
+                    document.getElementById('statusDisplay').classList.remove('show');
                     document.getElementById('statusIndicator').className = 'status-indicator offline';
                     document.getElementById('statusIndicator').innerHTML = '<span class="dot"></span> Offline';
                     if (statsInterval) clearInterval(statsInterval);
-                    loadActiveSessions();
+                    currentUniqueKey = '';
                 } else {
                     showToast('Error', data.message || 'Failed to stop', 'error');
                 }
@@ -1629,25 +1101,9 @@
             }
         });
 
-        // ============================================
-        // INIT
-        // ============================================
-        loadActiveSessions();
-
-        // Auto-load session from URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const sessionKey = urlParams.get('session');
-        if (sessionKey) {
-            document.getElementById('sessionKeyInput').value = sessionKey;
-            document.getElementById('sessionKeyDisplay').textContent = sessionKey;
-            document.getElementById('sessionInfo').classList.add('show');
-        }
-
-        console.log('🚀 WhatsApp Auto-Messenger Pro initialized');
-        console.log('📱 24/7 Uptime Guaranteed');
-        console.log('🔐 creds.json Authentication Mode');
-        console.log('⚡ Never Stop Mode Enabled');
-        console.log('✅ Phone Number field removed - creds.json only!');
+        console.log('🚀 WhatsApp Auto-Messenger initialized');
+        console.log('📱 creds.json Authentication Only');
+        console.log('⚡ No Session Key Required - Just Upload and Go!');
     </script>
 </body>
 </html>
