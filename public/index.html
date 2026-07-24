@@ -1,0 +1,1653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚡ WhatsApp Auto-Messenger Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6C63FF;
+            --primary-dark: #5A52D5;
+            --secondary: #00D2FF;
+            --success: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --bg-dark: #0A0A1A;
+            --bg-card: rgba(255, 255, 255, 0.04);
+            --border-color: rgba(255, 255, 255, 0.06);
+            --text-primary: #FFFFFF;
+            --text-secondary: #A8B2D1;
+            --text-muted: #4A5568;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            --radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg-dark);
+            min-height: 100vh;
+            color: var(--text-primary);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ============================================
+           ANIMATED BACKGROUND
+           ============================================ */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-animation .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.25;
+            animation: floatOrb 25s infinite ease-in-out;
+        }
+
+        .bg-animation .orb:nth-child(1) {
+            width: 700px;
+            height: 700px;
+            background: var(--primary);
+            top: -300px;
+            right: -200px;
+            animation-delay: 0s;
+        }
+
+        .bg-animation .orb:nth-child(2) {
+            width: 600px;
+            height: 600px;
+            background: var(--secondary);
+            bottom: -250px;
+            left: -200px;
+            animation-delay: -8s;
+        }
+
+        .bg-animation .orb:nth-child(3) {
+            width: 500px;
+            height: 500px;
+            background: var(--success);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: -16s;
+            opacity: 0.1;
+        }
+
+        @keyframes floatOrb {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(60px, -60px) scale(1.1); }
+            50% { transform: translate(-40px, 40px) scale(0.9); }
+            75% { transform: translate(30px, -30px) scale(1.05); }
+        }
+
+        /* ============================================
+           CONTAINER
+           ============================================ */
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* ============================================
+           HEADER
+           ============================================ */
+        .header {
+            text-align: center;
+            padding: 40px 0 32px;
+            position: relative;
+        }
+
+        .header .logo-wrapper {
+            display: inline-flex;
+            align-items: center;
+            gap: 18px;
+            margin-bottom: 14px;
+        }
+
+        .header .logo-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            box-shadow: 0 0 60px rgba(108, 99, 255, 0.25);
+            animation: glowPulse 4s infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes glowPulse {
+            0%, 100% { box-shadow: 0 0 60px rgba(108, 99, 255, 0.25); }
+            50% { box-shadow: 0 0 80px rgba(108, 99, 255, 0.45); }
+        }
+
+        .header h1 {
+            font-size: 2.6rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #FFFFFF 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+            line-height: 1.1;
+        }
+
+        .header .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            font-weight: 400;
+            margin-top: 6px;
+            letter-spacing: 0.3px;
+        }
+
+        .header .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            padding: 8px 24px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            color: var(--success);
+            margin-top: 18px;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+        }
+
+        .header .status-badge .dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: dotPulse 2s infinite;
+        }
+
+        @keyframes dotPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.7); }
+        }
+
+        /* ============================================
+           GLASS CARD
+           ============================================ */
+        .glass-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-radius: var(--radius);
+            padding: 28px;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), var(--secondary), transparent);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .glass-card:hover::before {
+            opacity: 1;
+        }
+
+        .glass-card:hover {
+            border-color: rgba(108, 99, 255, 0.15);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
+        }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            letter-spacing: -0.2px;
+        }
+
+        .card-title i {
+            color: var(--primary);
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* ============================================
+           GRID
+           ============================================ */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 28px;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ============================================
+           FORM ELEMENTS
+           ============================================ */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            letter-spacing: 0.2px;
+        }
+
+        .form-group label i {
+            margin-right: 8px;
+            color: var(--primary);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            transition: var(--transition);
+            outline: none;
+            font-family: var(--font);
+            font-weight: 400;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 4px rgba(108, 99, 255, 0.08);
+        }
+
+        .form-group input::placeholder {
+            color: var(--text-muted);
+            font-weight: 300;
+        }
+
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .form-group input[type="file"] {
+            padding: 10px;
+            cursor: pointer;
+            font-weight: 300;
+        }
+
+        .form-group input[type="file"]::file-selector-button {
+            padding: 8px 18px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            margin-right: 14px;
+            transition: var(--transition);
+            font-family: var(--font);
+            font-size: 0.85rem;
+        }
+
+        .form-group input[type="file"]::file-selector-button:hover {
+            transform: scale(1.04);
+            opacity: 0.9;
+        }
+
+        /* ============================================
+           CRED UPLOAD AREA
+           ============================================ */
+        .cred-upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 14px;
+            padding: 32px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .cred-upload-area:hover {
+            border-color: var(--primary);
+            background: rgba(108, 99, 255, 0.04);
+        }
+
+        .cred-upload-area.dragover {
+            border-color: var(--primary);
+            background: rgba(108, 99, 255, 0.08);
+            transform: scale(1.01);
+        }
+
+        .cred-upload-area .upload-icon {
+            font-size: 2.8rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            transition: var(--transition);
+        }
+
+        .cred-upload-area:hover .upload-icon {
+            color: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        .cred-upload-area p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            font-weight: 400;
+        }
+
+        .cred-upload-area .highlight {
+            color: var(--primary);
+            font-weight: 600;
+            background: rgba(108, 99, 255, 0.1);
+            padding: 2px 10px;
+            border-radius: 6px;
+        }
+
+        .cred-upload-area .sub-text {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        .cred-upload-area input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        /* ============================================
+           CRED FILE STATUS
+           ============================================ */
+        #credFileStatus {
+            margin-top: 14px;
+            padding: 12px 18px;
+            background: rgba(16, 185, 129, 0.08);
+            border-radius: 10px;
+            border: 1px solid rgba(16, 185, 129, 0.15);
+            color: var(--success);
+            font-size: 0.9rem;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+            animation: fadeSlide 0.4s ease;
+        }
+
+        #credFileStatus.show {
+            display: flex;
+        }
+
+        @keyframes fadeSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ============================================
+           BUTTONS
+           ============================================ */
+        .btn {
+            padding: 13px 28px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-family: var(--font);
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.2px;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateX(-100%);
+            transition: transform 0.5s;
+        }
+
+        .btn:hover::after {
+            transform: translateX(100%);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 4px 20px rgba(108, 99, 255, 0.25);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 35px rgba(108, 99, 255, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.25);
+        }
+
+        .btn-success:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 35px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #DC2626);
+            color: white;
+            box-shadow: 0 4px 20px rgba(239, 68, 68, 0.2);
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 35px rgba(239, 68, 68, 0.35);
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 0.82rem;
+            width: auto;
+        }
+
+        /* ============================================
+           SESSION INFO
+           ============================================ */
+        .session-info {
+            background: rgba(108, 99, 255, 0.04);
+            border-radius: 12px;
+            padding: 16px 18px;
+            margin-top: 16px;
+            border: 1px solid rgba(108, 99, 255, 0.08);
+            display: none;
+            animation: fadeSlide 0.4s ease;
+        }
+
+        .session-info.show {
+            display: block;
+        }
+
+        .session-info .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+            font-size: 0.88rem;
+        }
+
+        .session-info .info-row .label {
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .session-info .info-row .value {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .session-info .info-row .value .highlight-text {
+            color: var(--secondary);
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.8rem;
+            letter-spacing: 0.3px;
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px 10px;
+            border-radius: 6px;
+            transition: var(--transition);
+            font-size: 0.8rem;
+        }
+
+        .copy-btn:hover {
+            color: var(--primary);
+            background: rgba(108, 99, 255, 0.1);
+        }
+
+        /* ============================================
+           STATUS INDICATOR
+           ============================================ */
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 16px;
+            border-radius: 50px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.2px;
+        }
+
+        .status-indicator .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status-indicator.online {
+            background: rgba(16, 185, 129, 0.12);
+            color: var(--success);
+        }
+
+        .status-indicator.online .dot {
+            background: var(--success);
+            animation: dotPulse 2s infinite;
+        }
+
+        .status-indicator.offline {
+            background: rgba(239, 68, 68, 0.12);
+            color: var(--danger);
+        }
+
+        .status-indicator.offline .dot {
+            background: var(--danger);
+        }
+
+        .status-indicator.pending {
+            background: rgba(245, 158, 11, 0.12);
+            color: var(--warning);
+        }
+
+        .status-indicator.pending .dot {
+            background: var(--warning);
+            animation: dotPulse 1.2s infinite;
+        }
+
+        /* ============================================
+           STATS
+           ============================================ */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 16px 12px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .stat-box:hover {
+            border-color: rgba(108, 99, 255, 0.15);
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .stat-box .stat-number {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+        }
+
+        .stat-box .stat-label {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            font-weight: 600;
+        }
+
+        /* ============================================
+           UPTIME
+           ============================================ */
+        .uptime-display {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 18px;
+            background: rgba(16, 185, 129, 0.06);
+            border-radius: 12px;
+            border: 1px solid rgba(16, 185, 129, 0.1);
+            margin-top: 14px;
+            transition: var(--transition);
+        }
+
+        .uptime-display:hover {
+            border-color: rgba(16, 185, 129, 0.2);
+        }
+
+        .uptime-display .uptime-icon {
+            color: var(--success);
+            font-size: 1.1rem;
+            animation: dotPulse 2s infinite;
+        }
+
+        .uptime-display .uptime-label {
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            font-weight: 400;
+        }
+
+        .uptime-display .uptime-value {
+            font-weight: 700;
+            color: var(--success);
+            font-size: 1.05rem;
+            font-variant-numeric: tabular-nums;
+            font-family: 'Monaco', 'Menlo', monospace;
+        }
+
+        .uptime-display .uptime-badge {
+            margin-left: auto;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.04);
+            padding: 4px 14px;
+            border-radius: 50px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* ============================================
+           SESSION LIST
+           ============================================ */
+        .session-list {
+            max-height: 320px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .session-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .session-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .session-list::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        .session-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .session-item:hover {
+            border-color: rgba(108, 99, 255, 0.15);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .session-item .session-id {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            font-family: 'Monaco', 'Menlo', monospace;
+            letter-spacing: 0.2px;
+        }
+
+        .session-item .session-phone {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 36px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 2.2rem;
+            margin-bottom: 12px;
+            opacity: 0.3;
+        }
+
+        .empty-state p {
+            font-size: 0.9rem;
+        }
+
+        /* ============================================
+           LAST MESSAGE
+           ============================================ */
+        .last-message-box {
+            margin-top: 16px;
+            padding: 14px 18px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .last-message-box:hover {
+            border-color: rgba(108, 99, 255, 0.1);
+        }
+
+        .last-message-box .label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            font-weight: 600;
+        }
+
+        .last-message-box .message {
+            margin-top: 4px;
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            word-break: break-all;
+            font-weight: 400;
+        }
+
+        /* ============================================
+           SYSTEM INFO
+           ============================================ */
+        .system-info-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .system-info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .system-info-item:hover {
+            border-color: rgba(108, 99, 255, 0.1);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .system-info-item i {
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .system-info-item .info-text {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .system-info-item .info-text strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        @media (max-width: 900px) {
+            .system-info-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* ============================================
+           TOAST NOTIFICATIONS
+           ============================================ */
+        .toast-container {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 420px;
+            width: 100%;
+        }
+
+        .toast {
+            padding: 16px 20px;
+            border-radius: 14px;
+            background: rgba(16, 16, 35, 0.95);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+            animation: slideInRight 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            transition: var(--transition);
+        }
+
+        .toast.removing {
+            animation: slideOutRight 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .toast.success { border-left: 4px solid var(--success); }
+        .toast.error { border-left: 4px solid var(--danger); }
+        .toast.info { border-left: 4px solid var(--primary); }
+        .toast.warning { border-left: 4px solid var(--warning); }
+
+        .toast .toast-icon {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .toast .toast-content {
+            flex: 1;
+        }
+
+        .toast .toast-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            letter-spacing: -0.1px;
+        }
+
+        .toast .toast-message {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+            font-weight: 400;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+        }
+
+        /* ============================================
+           SPINNER
+           ============================================ */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ============================================
+           SCROLLBAR GLOBAL
+           ============================================ */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+        }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 768px) {
+            .container { padding: 16px; }
+            
+            .header { padding: 24px 0 20px; }
+            .header h1 { font-size: 1.8rem; }
+            .header .logo-icon { width: 50px; height: 50px; font-size: 22px; }
+            .header .subtitle { font-size: 0.9rem; }
+            
+            .dashboard-grid { gap: 16px; margin-top: 20px; }
+            .glass-card { padding: 20px; }
+            
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .stat-box .stat-number { font-size: 1.4rem; }
+            
+            .uptime-display { flex-wrap: wrap; gap: 8px; }
+            .uptime-display .uptime-badge { margin-left: 0; }
+            
+            .system-info-grid { grid-template-columns: 1fr 1fr; }
+            
+            .toast-container { top: 12px; right: 12px; max-width: calc(100% - 24px); }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 { font-size: 1.4rem; }
+            .header .logo-wrapper { gap: 12px; }
+            .header .logo-icon { width: 42px; height: 42px; font-size: 18px; }
+            
+            .stats-grid { grid-template-columns: 1fr; }
+            .system-info-grid { grid-template-columns: 1fr; }
+            
+            .glass-card { padding: 16px; }
+            .card-title { font-size: 0.95rem; }
+        }
+
+        /* ============================================
+           SESSION COUNT BADGE
+           ============================================ */
+        .session-count-badge {
+            margin-left: auto;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.04);
+            padding: 2px 12px;
+            border-radius: 50px;
+            font-weight: 500;
+        }
+
+        /* ============================================
+           SMOOTH FONT RENDERING
+           ============================================ */
+        .glass-card, .btn, .form-group input, .header h1, .header .subtitle {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="orb"></div>
+        <div class="orb"></div>
+        <div class="orb"></div>
+    </div>
+
+    <div class="container">
+        <!-- ==========================================
+        HEADER
+        ========================================== -->
+        <header class="header">
+            <div class="logo-wrapper">
+                <div class="logo-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <div>
+                    <h1>Auto-Messenger Pro</h1>
+                </div>
+            </div>
+            <p class="subtitle">24/7 WhatsApp Automation &bull; Powered by creds.json</p>
+            <div class="status-badge">
+                <span class="dot"></span>
+                System Online &bull; 24/7 Active
+            </div>
+        </header>
+
+        <!-- ==========================================
+        TOAST CONTAINER
+        ========================================== -->
+        <div class="toast-container" id="toastContainer"></div>
+
+        <!-- ==========================================
+        MAIN GRID
+        ========================================== -->
+        <div class="dashboard-grid">
+            <!-- LEFT: Connect Session -->
+            <div class="glass-card">
+                <div class="card-title">
+                    <i class="fas fa-plug"></i>
+                    Connect Session
+                </div>
+                
+                <form id="loginForm">
+                    <!-- NO PHONE NUMBER FIELD - Removed! -->
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-file"></i> Upload creds.json</label>
+                        <div class="cred-upload-area" id="credUploadArea">
+                            <div class="upload-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <p>Drop your <span class="highlight">creds.json</span> here</p>
+                            <p class="sub-text">or click to browse &bull; WhatsApp session file</p>
+                            <input type="file" id="credFileInput" accept=".json" required>
+                        </div>
+                        <div id="credFileStatus">
+                            <i class="fas fa-check-circle"></i>
+                            <span id="credFileName">creds.json loaded</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="loginBtn">
+                        <i class="fas fa-plug"></i>
+                        <span>Connect with creds.json</span>
+                    </button>
+                </form>
+
+                <div class="session-info" id="sessionInfo">
+                    <div class="info-row">
+                        <span class="label">Session Key</span>
+                        <span class="value">
+                            <span class="highlight-text" id="sessionKeyDisplay">-</span>
+                            <button class="copy-btn" onclick="copyToClipboard('sessionKeyDisplay')" title="Copy">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Status</span>
+                        <span class="value">
+                            <span class="status-indicator online" id="statusIndicator">
+                                <span class="dot"></span> Connected
+                            </span>
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Phone</span>
+                        <span class="value" id="phoneDisplay">-</span>
+                    </div>
+                </div>
+
+                <div class="uptime-display">
+                    <span class="uptime-icon"><i class="fas fa-clock"></i></span>
+                    <span class="uptime-label">Uptime:</span>
+                    <span class="uptime-value" id="uptimeValue">00:00:00</span>
+                    <span class="uptime-badge">∞ 24/7</span>
+                </div>
+            </div>
+
+            <!-- RIGHT: Messaging Control -->
+            <div class="glass-card">
+                <div class="card-title">
+                    <i class="fas fa-paper-plane"></i>
+                    Messaging Control
+                </div>
+
+                <form id="messagingForm">
+                    <div class="form-group">
+                        <label><i class="fas fa-key"></i> Session Key</label>
+                        <input type="text" id="sessionKeyInput" placeholder="Enter your session key" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-users"></i> Target</label>
+                        <input type="text" id="targetInput" placeholder="Group ID or Phone Number">
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-user-tag"></i> Sender Name</label>
+                        <input type="text" id="hatersNameInput" placeholder="Your name (optional)">
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-clock"></i> Speed (seconds)</label>
+                        <input type="number" id="speedInput" value="5" min="1" max="3600" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-file-alt"></i> Message File (.txt)</label>
+                        <input type="file" id="messageFileInput" accept=".txt" required>
+                        <small style="color: var(--text-muted); display: block; margin-top: 4px; font-size: 0.75rem;">One message per line</small>
+                    </div>
+
+                    <button type="submit" class="btn btn-success" id="startBtn">
+                        <i class="fas fa-play"></i>
+                        <span>Start Messaging</span>
+                    </button>
+                </form>
+
+                <button class="btn btn-danger" id="stopBtn" style="margin-top: 14px;">
+                    <i class="fas fa-stop"></i>
+                    <span>Stop &amp; Logout</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ==========================================
+        BOTTOM SECTION
+        ========================================== -->
+        <div class="dashboard-grid" style="margin-top: 24px;">
+            <!-- Sessions List -->
+            <div class="glass-card">
+                <div class="card-title">
+                    <i class="fas fa-list"></i>
+                    Active Sessions
+                    <span class="session-count-badge" id="sessionCount">0</span>
+                </div>
+                <div class="session-list" id="sessionList">
+                    <div class="empty-state">
+                        <i class="fas fa-database"></i>
+                        <p>No active sessions</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="glass-card">
+                <div class="card-title">
+                    <i class="fas fa-chart-bar"></i>
+                    Live Statistics
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-number" id="sentCount">0</div>
+                        <div class="stat-label">Messages Sent</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number" id="failedCount">0</div>
+                        <div class="stat-label">Failed</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number" id="totalMessages">0</div>
+                        <div class="stat-label">In Queue</div>
+                    </div>
+                </div>
+                <div class="last-message-box">
+                    <div class="label">Last Message</div>
+                    <div class="message" id="lastMessageDisplay">-</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==========================================
+        SYSTEM INFO
+        ========================================== -->
+        <div class="glass-card" style="margin-top: 24px;">
+            <div class="card-title">
+                <i class="fas fa-server"></i>
+                System Status
+            </div>
+            <div class="system-info-grid">
+                <div class="system-info-item">
+                    <i class="fas fa-check-circle" style="color: var(--success);"></i>
+                    <span class="info-text">Status: <strong style="color: var(--success);">Online</strong></span>
+                </div>
+                <div class="system-info-item">
+                    <i class="fas fa-infinity" style="color: var(--warning);"></i>
+                    <span class="info-text">Uptime: <strong style="color: var(--warning);">Infinite</strong></span>
+                </div>
+                <div class="system-info-item">
+                    <i class="fas fa-shield-alt" style="color: var(--primary);"></i>
+                    <span class="info-text">Auth: <strong style="color: var(--primary);">creds.json</strong></span>
+                </div>
+                <div class="system-info-item">
+                    <i class="fas fa-sync-alt" style="color: var(--secondary);"></i>
+                    <span class="info-text">Auto-Restore: <strong style="color: var(--secondary);">Enabled</strong></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+    JAVASCRIPT
+    ========================================== -->
+    <script>
+        'use strict';
+
+        // ============================================
+        // GLOBALS
+        // ============================================
+        let currentSessionKey = '';
+        let uptimeInterval = null;
+        let statsInterval = null;
+        let startTime = Date.now();
+        let credFile = null;
+
+        // ============================================
+        // TOAST SYSTEM
+        // ============================================
+        function showToast(title, message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle',
+                info: 'fa-info-circle',
+                warning: 'fa-exclamation-triangle'
+            };
+            
+            toast.innerHTML = `
+                <span class="toast-icon"><i class="fas ${icons[type] || icons.info}"></i></span>
+                <div class="toast-content">
+                    <div class="toast-title">${title}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add('removing');
+                setTimeout(() => toast.remove(), 300);
+            }, 5000);
+        }
+
+        // ============================================
+        // UPTIME
+        // ============================================
+        function updateUptime() {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const hours = String(Math.floor(elapsed / 3600)).padStart(2, '0');
+            const minutes = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
+            const seconds = String(elapsed % 60).padStart(2, '0');
+            document.getElementById('uptimeValue').textContent = `${hours}:${minutes}:${seconds}`;
+        }
+
+        startTime = Date.now();
+        updateUptime();
+        uptimeInterval = setInterval(updateUptime, 1000);
+
+        // ============================================
+        // COPY TO CLIPBOARD
+        // ============================================
+        function copyToClipboard(elementId) {
+            const text = document.getElementById(elementId).textContent.trim();
+            if (text && text !== '-') {
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast('Copied!', 'Session key copied to clipboard', 'success');
+                }).catch(() => {
+                    // Fallback
+                    const input = document.createElement('input');
+                    input.value = text;
+                    document.body.appendChild(input);
+                    input.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(input);
+                    showToast('Copied!', 'Session key copied to clipboard', 'success');
+                });
+            }
+        }
+
+        // ============================================
+        // CRED FILE UPLOAD
+        // ============================================
+        const credUploadArea = document.getElementById('credUploadArea');
+        const credFileInput = document.getElementById('credFileInput');
+        const credFileStatus = document.getElementById('credFileStatus');
+        const credFileName = document.getElementById('credFileName');
+
+        credUploadArea.addEventListener('click', () => credFileInput.click());
+
+        credUploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            credUploadArea.classList.add('dragover');
+        });
+
+        credUploadArea.addEventListener('dragleave', () => {
+            credUploadArea.classList.remove('dragover');
+        });
+
+        credUploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            credUploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                const file = files[0];
+                if (file.name === 'creds.json') {
+                    handleCredFile(file);
+                } else {
+                    showToast('Error', 'Please upload a valid creds.json file', 'error');
+                }
+            }
+        });
+
+        credFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                if (file.name === 'creds.json') {
+                    handleCredFile(file);
+                } else {
+                    showToast('Error', 'Please upload a valid creds.json file', 'error');
+                    e.target.value = '';
+                }
+            }
+        });
+
+        function handleCredFile(file) {
+            credFile = file;
+            credFileName.textContent = file.name;
+            credFileStatus.classList.add('show');
+            showToast('Success', 'creds.json loaded successfully!', 'success');
+        }
+
+        // ============================================
+        // LOGIN (NO PHONE NUMBER)
+        // ============================================
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const btn = document.getElementById('loginBtn');
+            
+            if (!credFile) {
+                showToast('Error', 'Please upload creds.json first', 'error');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Connecting...';
+
+            try {
+                const formData = new FormData();
+                formData.append('credsFile', credFile);
+
+                const response = await fetch('/login-with-creds', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showToast('Success', 'WhatsApp connected successfully!', 'success');
+                    currentSessionKey = data.uniqueKey;
+                    
+                    document.getElementById('sessionKeyInput').value = data.uniqueKey;
+                    document.getElementById('sessionKeyDisplay').textContent = data.uniqueKey;
+                    document.getElementById('phoneDisplay').textContent = 'Connected ✓';
+                    document.getElementById('sessionInfo').classList.add('show');
+                    
+                    document.getElementById('statusIndicator').className = 'status-indicator online';
+                    document.getElementById('statusIndicator').innerHTML = '<span class="dot"></span> Connected';
+                    
+                    showToast('Info', `Session Key: ${data.uniqueKey}`, 'info');
+                    
+                    loadActiveSessions();
+                    startStatsPolling(data.uniqueKey);
+                } else {
+                    showToast('Error', data.message || 'Connection failed', 'error');
+                }
+            } catch (error) {
+                showToast('Error', 'Server error: ' + error.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-plug"></i><span>Connect with creds.json</span>';
+            }
+        });
+
+        // ============================================
+        // LOAD ACTIVE SESSIONS
+        // ============================================
+        async function loadActiveSessions() {
+            try {
+                const response = await fetch('/sessionStatus/all');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                const container = document.getElementById('sessionList');
+                const count = document.getElementById('sessionCount');
+                
+                const sessions = Object.entries(data);
+                count.textContent = sessions.length;
+                
+                if (sessions.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-database"></i>
+                            <p>No active sessions</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = sessions.map(([key, session]) => `
+                    <div class="session-item">
+                        <div>
+                            <div class="session-id">${key}</div>
+                            <div class="session-phone">${session.phoneNumber || 'N/A'}</div>
+                        </div>
+                        <div class="session-status">
+                            <span class="status-indicator ${session.connected ? 'online' : 'offline'}">
+                                <span class="dot"></span> ${session.connected ? 'Online' : 'Offline'}
+                            </span>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Load sessions error:', error);
+                document.getElementById('sessionList').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle" style="color: var(--warning);"></i>
+                        <p style="color: var(--warning);">Failed to load sessions</p>
+                    </div>
+                `;
+            }
+        }
+
+        // ============================================
+        // START STATS POLLING
+        // ============================================
+        function startStatsPolling(uniqueKey) {
+            if (statsInterval) clearInterval(statsInterval);
+            
+            statsInterval = setInterval(async () => {
+                try {
+                    const response = await fetch(`/sessionStatus/${uniqueKey}`);
+                    const data = await response.json();
+                    
+                    if (data.exists) {
+                        document.getElementById('sentCount').textContent = data.sent || 0;
+                        document.getElementById('failedCount').textContent = data.failed || 0;
+                        document.getElementById('totalMessages').textContent = data.messageCount || 0;
+                        document.getElementById('lastMessageDisplay').textContent = data.lastMessage || '-';
+                    }
+                } catch (error) {
+                    console.error('Stats error:', error);
+                }
+            }, 2000);
+        }
+
+        // ============================================
+        // START MESSAGING
+        // ============================================
+        document.getElementById('messagingForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const uniqueKey = document.getElementById('sessionKeyInput').value.trim();
+            const target = document.getElementById('targetInput').value.trim();
+            const hatersName = document.getElementById('hatersNameInput').value.trim();
+            const speed = document.getElementById('speedInput').value;
+            const fileInput = document.getElementById('messageFileInput');
+            
+            if (!uniqueKey || !target || !speed || !fileInput.files[0]) {
+                showToast('Error', 'Please fill all fields and select a file', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('startBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Starting...';
+
+            try {
+                const formData = new FormData();
+                formData.append('uniqueKey', uniqueKey);
+                formData.append('target', target);
+                formData.append('hatersName', hatersName);
+                formData.append('speed', speed);
+                formData.append('messageFile', fileInput.files[0]);
+
+                const response = await fetch('/startMessaging', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showToast('Success', `Messaging started! ${data.messageCount} messages loaded`, 'success');
+                    startStatsPolling(uniqueKey);
+                } else {
+                    showToast('Error', data.message || 'Failed to start', 'error');
+                }
+            } catch (error) {
+                showToast('Error', 'Server error: ' + error.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-play"></i><span>Start Messaging</span>';
+            }
+        });
+
+        // ============================================
+        // STOP SESSION
+        // ============================================
+        document.getElementById('stopBtn').addEventListener('click', async () => {
+            const uniqueKey = document.getElementById('sessionKeyInput').value.trim();
+            if (!uniqueKey) {
+                showToast('Error', 'No session key provided', 'error');
+                return;
+            }
+
+            if (!confirm('Are you sure you want to stop and logout this session?')) return;
+
+            const btn = document.getElementById('stopBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Stopping...';
+
+            try {
+                const response = await fetch('/stop', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ uniqueKey })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showToast('Stopped', 'Session stopped and logged out successfully', 'info');
+                    document.getElementById('sessionInfo').classList.remove('show');
+                    document.getElementById('statusIndicator').className = 'status-indicator offline';
+                    document.getElementById('statusIndicator').innerHTML = '<span class="dot"></span> Offline';
+                    if (statsInterval) clearInterval(statsInterval);
+                    loadActiveSessions();
+                } else {
+                    showToast('Error', data.message || 'Failed to stop', 'error');
+                }
+            } catch (error) {
+                showToast('Error', 'Server error: ' + error.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-stop"></i><span>Stop &amp; Logout</span>';
+            }
+        });
+
+        // ============================================
+        // INIT
+        // ============================================
+        loadActiveSessions();
+
+        // Auto-load session from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionKey = urlParams.get('session');
+        if (sessionKey) {
+            document.getElementById('sessionKeyInput').value = sessionKey;
+            document.getElementById('sessionKeyDisplay').textContent = sessionKey;
+            document.getElementById('sessionInfo').classList.add('show');
+        }
+
+        console.log('🚀 WhatsApp Auto-Messenger Pro initialized');
+        console.log('📱 24/7 Uptime Guaranteed');
+        console.log('🔐 creds.json Authentication Mode');
+        console.log('⚡ Never Stop Mode Enabled');
+        console.log('✅ Phone Number field removed - creds.json only!');
+    </script>
+</body>
+</html>
