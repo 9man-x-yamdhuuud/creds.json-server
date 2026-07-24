@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>whatsApp · message bot</title>
-  <!-- Google Font + icons -->
+  <title>WhatsApp · Message Bot</title>
+  <!-- Google Fonts + Font Awesome -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
@@ -17,50 +17,50 @@
     }
 
     body {
-      font-family: 'Inter', -apple-system, system-ui, sans-serif;
-      background: radial-gradient(circle at 20% 30%, #111827, #0a0e17 90%);
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: radial-gradient(circle at 20% 30%, #0f172a, #060a13 90%);
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 1.5rem;
+      padding: 1.2rem;
       color: #f1f5f9;
       line-height: 1.5;
     }
 
-    /* ——— glassmorphism premium ——— */
-    .glass-orb {
-      background: rgba(15, 23, 42, 0.55);
-      backdrop-filter: blur(18px) saturate(200%);
-      -webkit-backdrop-filter: blur(18px) saturate(200%);
-      border-radius: 3.5rem;
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      box-shadow: 0 40px 70px -25px rgba(0, 0, 0, 0.9), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+    /* ---- Glassmorphism Premium ---- */
+    .glass {
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(20px) saturate(200%);
+      -webkit-backdrop-filter: blur(20px) saturate(200%);
+      border-radius: 3rem;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      box-shadow: 0 40px 80px -30px rgba(0, 0, 0, 0.9), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
       padding: 2.5rem 2.8rem;
-      max-width: 780px;
+      max-width: 760px;
       width: 100%;
-      transition: all 0.2s ease;
+      transition: all 0.3s ease;
     }
 
-    @media (max-width: 550px) {
-      .glass-orb { padding: 1.8rem 1.2rem; border-radius: 2.4rem; }
+    @media (max-width: 540px) {
+      .glass { padding: 1.8rem 1.2rem; border-radius: 2rem; }
     }
 
-    /* ——— header ——— */
+    /* ---- Header ---- */
     .brand {
       display: flex;
       align-items: center;
-      gap: 0.8rem;
+      gap: 0.75rem;
       margin-bottom: 0.2rem;
     }
 
     .brand i {
-      font-size: 2.3rem;
+      font-size: 2.4rem;
       background: linear-gradient(145deg, #25d366, #0f9d58);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      filter: drop-shadow(0 0 8px #25d36644);
+      filter: drop-shadow(0 0 12px #25d36644);
     }
 
     .brand h1 {
@@ -73,27 +73,25 @@
       color: transparent;
     }
 
-    .tagline {
+    .sub {
       font-weight: 400;
       font-size: 0.9rem;
       color: #94a3b8;
-      margin-top: -0.1rem;
       margin-bottom: 2rem;
-      padding-left: 0.3rem;
-      border-left: 3px solid #25d366;
       padding-left: 1rem;
+      border-left: 3px solid #25d366;
       display: flex;
       align-items: center;
       gap: 0.5rem;
     }
 
-    .tagline i { color: #25d366; font-size: 0.8rem; }
+    .sub i { color: #25d366; font-size: 0.8rem; }
 
-    /* ——— forms ——— */
+    /* ---- Forms ---- */
     .flow {
       display: flex;
       flex-direction: column;
-      gap: 1.6rem;
+      gap: 1.5rem;
     }
 
     .field {
@@ -144,7 +142,7 @@
       font-weight: 400;
     }
 
-    /* file upload */
+    /* ---- File Upload ---- */
     .file-zone {
       position: relative;
       display: flex;
@@ -191,7 +189,7 @@
       box-shadow: 0 6px 14px -6px #25d36655;
     }
 
-    /* buttons */
+    /* ---- Buttons ---- */
     .btn {
       border: none;
       border-radius: 3rem;
@@ -252,7 +250,7 @@
 
     .row-2 .btn { flex: 1 1 0; min-width: 130px; }
 
-    /* ——— status panel ——— */
+    /* ---- Status ---- */
     .status-glass {
       background: rgba(0, 0, 0, 0.3);
       border-radius: 2.5rem;
@@ -289,20 +287,10 @@
       margin-right: 0.25rem;
     }
 
-    .dot.on { background: #25d366; box-shadow: 0 0 10px #25d366aa; }
-    .dot.off { background: #ff4d6d; box-shadow: 0 0 10px #ff4d6daa; }
+    .dot.on { background: #25d366; box-shadow: 0 0 12px #25d366aa; }
+    .dot.off { background: #ff4d6d; box-shadow: 0 0 12px #ff4d6daa; }
 
-    .stat-badge {
-      background: rgba(0, 0, 0, 0.25);
-      border-radius: 2rem;
-      padding: 0.35rem 1.2rem;
-      text-align: center;
-      font-weight: 600;
-      font-size: 0.85rem;
-    }
-
-    .stat-badge span { font-weight: 700; color: #f1f5f9; }
-
+    /* ---- Toast ---- */
     .toast {
       background: rgba(0, 0, 0, 0.7);
       backdrop-filter: blur(12px);
@@ -322,55 +310,121 @@
 
     .hidden { display: none !important; }
 
+    /* ---- Pairing Code Box (BIG & BEAUTIFUL) ---- */
     .pair-box {
-      background: #1f253a;
-      border-radius: 3rem;
-      padding: 0.8rem 1.6rem;
+      background: linear-gradient(145deg, #1e253a, #12182b);
+      border-radius: 2.5rem;
+      padding: 1.8rem 2rem;
       text-align: center;
-      font-weight: 600;
-      border: 1px solid #25d36633;
+      border: 2px solid #25d36655;
+      box-shadow: 0 0 40px #25d36622, inset 0 0 30px #25d36608;
       margin-top: 0.8rem;
-      letter-spacing: 1px;
+      animation: pulse-glow 2s infinite alternate;
+      transition: all 0.4s ease;
     }
 
-    .pair-box i { color: #25d366; margin-right: 8px; }
+    @keyframes pulse-glow {
+      0% { border-color: #25d36644; box-shadow: 0 0 30px #25d36622; }
+      100% { border-color: #25d366aa; box-shadow: 0 0 60px #25d36644; }
+    }
 
+    .pair-box .pair-icon {
+      font-size: 2.2rem;
+      color: #25d366;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .pair-box .pair-label {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .pair-box .pair-code {
+      font-size: 3.2rem;
+      font-weight: 800;
+      letter-spacing: 0.2em;
+      color: #f1f5f9;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 0.5rem 1.5rem;
+      border-radius: 1.5rem;
+      display: inline-block;
+      margin: 0.5rem 0 0.2rem;
+      font-family: 'Inter', monospace;
+      text-shadow: 0 0 30px #25d36644;
+    }
+
+    .pair-box .pair-sub {
+      font-size: 0.8rem;
+      color: #64748b;
+      margin-top: 0.3rem;
+    }
+
+    .pair-box .pair-spinner {
+      display: inline-block;
+      width: 1.2rem;
+      height: 1.2rem;
+      border: 3px solid #25d36633;
+      border-top-color: #25d366;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-left: 0.5rem;
+      vertical-align: middle;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ---- Text Muted ---- */
     .text-muted { color: #64748b; font-size: 0.7rem; margin-top: 0.5rem; text-align: center; }
 
     @media (max-width: 480px) {
       .status-glass { flex-direction: column; align-items: stretch; }
       .row-2 { flex-direction: column; }
+      .pair-box .pair-code { font-size: 2.2rem; letter-spacing: 0.1em; }
     }
   </style>
 </head>
 <body>
 
-<div class="glass-orb" id="app">
+<div class="glass" id="app">
   
-  <!-- header -->
+  <!-- Header -->
   <div class="brand">
     <i class="fab fa-whatsapp"></i>
     <h1>message•bot</h1>
   </div>
-  <div class="tagline">
-    <i class="fas fa-bolt"></i> 
-    <span>automate · manage · go</span>
+  <div class="sub">
+    <i class="fas fa-bolt"></i>
+    <span>automate · 24/7 · non-stop</span>
   </div>
 
-  <!-- login zone -->
+  <!-- ===== LOGIN ZONE ===== -->
   <div id="loginZone" class="flow">
     <div class="field">
       <label><i class="fas fa-phone-alt"></i> phone number</label>
       <input type="text" id="phoneInput" placeholder="+92 300 1234567" value="923001234567">
     </div>
     <button class="btn" id="loginBtn"><i class="fas fa-key"></i> login / pair</button>
+    
+    <!-- Login Toast -->
     <div id="loginToast" class="toast hidden"><i class="fas fa-circle-check"></i> <span id="loginMsg">ready</span></div>
+    
+    <!-- PAIRING CODE BOX - BIG & BEAUTIFUL, stays until connected -->
     <div id="pairBox" class="pair-box hidden">
-      <i class="fas fa-shield-alt"></i> pairing code: <span id="pairCodeDisplay" style="font-weight: 800; letter-spacing: 3px;">——</span>
+      <span class="pair-icon"><i class="fas fa-qrcode"></i></span>
+      <div class="pair-label">📱 enter this code in WhatsApp</div>
+      <div class="pair-code" id="pairCodeDisplay">—— —— —— ——</div>
+      <div class="pair-sub">
+        <i class="fas fa-clock"></i> waiting for connection... 
+        <span class="pair-spinner"></span>
+      </div>
     </div>
   </div>
 
-  <!-- control zone -->
+  <!-- ===== CONTROL ZONE (hidden until connected) ===== -->
   <div id="controlZone" class="hidden flow" style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.03); padding-top: 2rem;">
     
     <div class="field">
@@ -402,9 +456,10 @@
       <button class="btn btn-danger" id="stopBtn"><i class="fas fa-power-off"></i> stop & logout</button>
     </div>
 
+    <!-- Messaging Toast -->
     <div id="msgToast" class="toast hidden"><i class="fas fa-circle-info"></i> <span id="statusMsg">idle</span></div>
 
-    <!-- live status -->
+    <!-- Live Status -->
     <div class="status-glass">
       <div class="chip"><i class="fas fa-wifi"></i> <span id="connectionBadge"><span class="dot off"></span> offline</span></div>
       <div class="chip"><i class="fas fa-envelope"></i> <span id="msgCount">0</span> msgs</div>
@@ -420,7 +475,7 @@
 
 <script>
   (function() {
-    // ——— refs ———
+    // ——— DOM refs ———
     const $ = id => document.getElementById(id);
     const loginZone = $('loginZone');
     const controlZone = $('controlZone');
@@ -451,6 +506,7 @@
     let uniqueKey = null;
     let pollInterval = null;
     let isConnected = false;
+    let isWaitingForPair = false;
 
     // ——— helpers ———
     function setToast(el, msg, type = 'info') {
@@ -488,6 +544,13 @@
           const badge = connectionBadge;
           if (isConnected) {
             badge.innerHTML = `<span class="dot on"></span> online`;
+            // If connected and pair box is showing, hide it and show controls
+            if (!pairBox.classList.contains('hidden')) {
+              pairBox.classList.add('hidden');
+              loginZone.classList.add('hidden');
+              controlZone.classList.remove('hidden');
+              setLoginToast('✅ Connected!', false);
+            }
           } else {
             badge.innerHTML = `<span class="dot off"></span> offline`;
           }
@@ -503,7 +566,7 @@
 
     function startPolling() {
       if (pollInterval) clearInterval(pollInterval);
-      pollInterval = setInterval(updateUI, 2500);
+      pollInterval = setInterval(updateUI, 2000);
       updateUI();
     }
 
@@ -511,13 +574,13 @@
       if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
     }
 
-    // ——— login ———
+    // ——— LOGIN ———
     loginBtn.addEventListener('click', async () => {
       const phone = phoneInput.value.trim();
       if (!phone) { setLoginToast('Phone number required', true); return; }
       loginBtn.disabled = true;
       loginBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> connecting...';
-      setLoginToast('Requesting pairing...');
+      setLoginToast('Requesting pairing code...');
 
       try {
         const resp = await fetch('/login', {
@@ -533,10 +596,36 @@
           return;
         }
         uniqueKey = data.uniqueKey;
+        
+        // Show pairing code in BIG BEAUTIFUL box
         if (data.pairingCode) {
           pairBox.classList.remove('hidden');
-          pairCodeDisplay.textContent = data.pairingCode;
-          setLoginToast('Pairing code generated!');
+          // Format code with spaces
+          const code = data.pairingCode.replace(/-/g, '');
+          const formatted = code.match(/.{1,4}/g)?.join(' — ') || code;
+          pairCodeDisplay.textContent = formatted;
+          setLoginToast('📱 Enter pairing code in WhatsApp', false);
+          isWaitingForPair = true;
+          
+          // Start polling to check connection status
+          if (!pollInterval) {
+            pollInterval = setInterval(async () => {
+              if (!uniqueKey) return;
+              try {
+                const statusResp = await fetch(`/sessionStatus/${uniqueKey}`);
+                const statusData = await statusResp.json();
+                if (statusData.connected) {
+                  // Connected! Hide pair box, show controls
+                  pairBox.classList.add('hidden');
+                  loginZone.classList.add('hidden');
+                  controlZone.classList.remove('hidden');
+                  setLoginToast('✅ Connected!', false);
+                  isWaitingForPair = false;
+                  startPolling();
+                }
+              } catch (e) {}
+            }, 2000);
+          }
         } else if (data.connected) {
           pairBox.classList.add('hidden');
           setLoginToast('Already connected!');
@@ -547,13 +636,9 @@
           setLoginToast('Connected! Waiting for pairing...');
         }
 
+        // Show session key
         if (uniqueKey) {
-          setTimeout(() => {
-            loginZone.classList.add('hidden');
-            controlZone.classList.remove('hidden');
-            sessionKeyDisplay.textContent = uniqueKey.substring(0, 12) + '…';
-            startPolling();
-          }, 600);
+          sessionKeyDisplay.textContent = uniqueKey.substring(0, 12) + '…';
         }
       } catch (e) {
         setLoginToast('Network error: ' + e.message, true);
@@ -563,7 +648,7 @@
       }
     });
 
-    // ——— start messaging ———
+    // ——— START MESSAGING ———
     startBtn.addEventListener('click', async () => {
       if (!uniqueKey) { setMsgToast('No session. Login first.', 'error'); return; }
       const target = targetInput.value.trim();
@@ -608,7 +693,7 @@
       }
     });
 
-    // ——— stop & logout ———
+    // ——— STOP & LOGOUT ———
     stopBtn.addEventListener('click', async () => {
       if (!uniqueKey) { setMsgToast('No session to stop', 'error'); return; }
       stopBtn.disabled = true;
@@ -629,6 +714,9 @@
           uniqueKey = null;
           sessionKeyDisplay.textContent = '—';
           connectionBadge.innerHTML = `<span class="dot off"></span> offline`;
+          isWaitingForPair = false;
+          loginBtn.innerHTML = '<i class="fas fa-key"></i> login / pair';
+          loginBtn.disabled = false;
         } else {
           setMsgToast('❌ ' + (data.message || 'Stop failed'), 'error');
         }
@@ -640,7 +728,7 @@
       }
     });
 
-    // ——— file label ———
+    // ——— FILE LABEL ———
     fileInput.addEventListener('change', function() {
       if (this.files && this.files.length > 0) {
         fileLabel.innerHTML = `<i class="fas fa-file-lines" style="margin-right:6px;"></i> ${this.files[0].name}`;
@@ -649,7 +737,7 @@
       }
     });
 
-    console.log('🚀 ready — login to start');
+    console.log('🚀 Ready — login to start');
   })();
 </script>
 
