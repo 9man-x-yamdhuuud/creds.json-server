@@ -1,19 +1,55 @@
 {
-  "name": "whatsapp-auto-messenger",
+  "name": "whatsapp-messaging-bot",
   "version": "2.0.0",
-  "description": "WhatsApp Auto-Messenger",
+  "description": "24/7 WhatsApp Messaging Bot with Auto-Restart, Health Check, and Continuous Operation",
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "pm2": "pm2 start index.js --name whatsapp-bot",
+    "pm2:stop": "pm2 stop whatsapp-bot",
+    "pm2:restart": "pm2 restart whatsapp-bot",
+    "pm2:logs": "pm2 logs whatsapp-bot"
   },
+  "keywords": [
+    "whatsapp",
+    "bot",
+    "messaging",
+    "automation",
+    "24/7",
+    "baileys",
+    "whatsapp-bot",
+    "auto-messaging",
+    "group-messaging"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
   "dependencies": {
     "@hapi/boom": "^10.0.1",
-    "@whiskeysockets/baileys": "^6.6.0",
+    "@whiskeysockets/baileys": "^6.7.9",
     "chalk": "^5.3.0",
     "cors": "^2.8.5",
-    "express": "^4.18.2",
+    "crypto": "^1.0.1",
+    "express": "^4.21.2",
+    "fs": "^0.0.1-security",
     "multer": "^1.4.5-lts.1",
-    "pino": "^8.15.0"
-  }
+    "path": "^0.12.7",
+    "pino": "^9.5.0",
+    "url": "^0.11.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/whatsapp-messaging-bot"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/whatsapp-messaging-bot/issues"
+  },
+  "homepage": "https://github.com/yourusername/whatsapp-messaging-bot#readme"
 }
