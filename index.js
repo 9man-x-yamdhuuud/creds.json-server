@@ -22,21 +22,17 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // ============================================
-// AUTO CREATE FOLDERS - Kuch nahi karna padega!
+// 🚀 AUTO CREATE FOLDERS - Kuch nahi karna!
 // ============================================
-const folders = ['uploads', 'session', 'public'];
-folders.forEach(folder => {
+['uploads', 'session', 'public'].forEach(folder => {
   if (!fs.existsSync(folder)) {
     fs.mkdirSync(folder, { recursive: true });
-    console.log(chalk.green(`✅ Created folder: ${folder}`));
+    console.log(chalk.green(`✅ Created: ${folder}`));
   }
 });
-
-// Permissions set karo
 try {
   fs.chmodSync('uploads', 0o777);
   fs.chmodSync('session', 0o777);
-  console.log(chalk.green('✅ Permissions set for uploads and session'));
 } catch (e) {}
 
 const upload = multer({ 
