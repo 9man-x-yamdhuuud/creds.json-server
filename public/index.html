@@ -83,6 +83,7 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
+      flex-wrap: wrap;
     }
 
     .sub i { color: #25d366; font-size: 0.8rem; }
@@ -241,6 +242,16 @@
       box-shadow: 0 16px 32px -10px #ff4d6d77;
     }
 
+    .btn-purple {
+      background: linear-gradient(145deg, #8b5cf6, #7c3aed);
+      box-shadow: 0 12px 28px -12px #7c3aed66;
+    }
+
+    .btn-purple:hover {
+      background: linear-gradient(145deg, #9d71f8, #8b5cf6);
+      box-shadow: 0 16px 32px -10px #7c3aed88;
+    }
+
     .row-2 {
       display: flex;
       flex-wrap: wrap;
@@ -249,6 +260,14 @@
     }
 
     .row-2 .btn { flex: 1 1 0; min-width: 130px; }
+
+    .row-3 {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+    }
+
+    .row-3 .btn { flex: 1 1 0; min-width: 100px; }
 
     /* ---- Status ---- */
     .status-glass {
@@ -310,7 +329,7 @@
 
     .hidden { display: none !important; }
 
-    /* ---- Pairing Code Box (BIG & BEAUTIFUL) ---- */
+    /* ---- Pairing Code Box ---- */
     .pair-box {
       background: linear-gradient(145deg, #1e253a, #12182b);
       border-radius: 2.5rem;
@@ -377,12 +396,80 @@
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ---- Text Muted ---- */
+    /* ---- Group List ---- */
+    .group-list-box {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 1.5rem;
+      padding: 1rem 1.2rem;
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      margin-top: 0.5rem;
+    }
+
+    .group-list-box::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .group-list-box::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 10px;
+    }
+
+    .group-list-box::-webkit-scrollbar-thumb {
+      background: #25d36655;
+      border-radius: 10px;
+    }
+
+    .group-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0.8rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: 0.15s;
+      border-radius: 0.5rem;
+    }
+
+    .group-item:hover {
+      background: rgba(37, 211, 102, 0.08);
+    }
+
+    .group-item .g-name {
+      color: #eef3ff;
+      font-weight: 500;
+    }
+
+    .group-item .g-id {
+      color: #64748b;
+      font-size: 0.7rem;
+      font-family: monospace;
+    }
+
+    .group-item .g-select {
+      color: #25d366;
+      font-size: 0.8rem;
+      opacity: 0;
+      transition: 0.2s;
+    }
+
+    .group-item:hover .g-select {
+      opacity: 1;
+    }
+
+    .group-item.selected {
+      background: rgba(37, 211, 102, 0.12);
+      border-left: 3px solid #25d366;
+    }
+
     .text-muted { color: #64748b; font-size: 0.7rem; margin-top: 0.5rem; text-align: center; }
 
     @media (max-width: 480px) {
       .status-glass { flex-direction: column; align-items: stretch; }
       .row-2 { flex-direction: column; }
+      .row-3 { flex-direction: column; }
       .pair-box .pair-code { font-size: 2.2rem; letter-spacing: 0.1em; }
     }
   </style>
@@ -412,7 +499,7 @@
     <!-- Login Toast -->
     <div id="loginToast" class="toast hidden"><i class="fas fa-circle-check"></i> <span id="loginMsg">ready</span></div>
     
-    <!-- PAIRING CODE BOX - BIG & BEAUTIFUL, stays until connected -->
+    <!-- PAIRING CODE BOX -->
     <div id="pairBox" class="pair-box hidden">
       <span class="pair-icon"><i class="fas fa-qrcode"></i></span>
       <div class="pair-label">📱 enter this code in WhatsApp</div>
@@ -424,9 +511,28 @@
     </div>
   </div>
 
-  <!-- ===== CONTROL ZONE (hidden until connected) ===== -->
+  <!-- ===== CONTROL ZONE ===== -->
   <div id="controlZone" class="hidden flow" style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.03); padding-top: 2rem;">
     
+    <!-- Fetch Groups Button -->
+    <div class="row-3">
+      <button class="btn btn-purple" id="fetchGroupsCyber">
+        <i class="fas fa-users"></i> Fetch Groups
+      </button>
+    </div>
+
+    <!-- Groups List -->
+    <div id="groupsContainer" class="hidden" style="margin-top: 0.2rem;">
+      <div class="field">
+        <label><i class="fas fa-list"></i> Select Group (click to copy ID)</label>
+        <div class="group-list-box" id="groupListBox">
+          <div style="text-align:center; color:#64748b; padding:1rem; font-size:0.9rem;">
+            <i class="fas fa-spinner fa-pulse"></i> Loading groups...
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="field">
       <label><i class="fas fa-bullseye"></i> target (ID or number)</label>
       <input type="text" id="targetInput" placeholder="923001234567-123456@g.us">
@@ -502,11 +608,17 @@
     const failCount = $('failCount');
     const sessionKeyDisplay = $('sessionKeyDisplay');
 
+    // Groups
+    const fetchGroupsBtn = $('fetchGroupsCyber');
+    const groupsContainer = $('groupsContainer');
+    const groupListBox = $('groupListBox');
+
     // ——— state ———
     let uniqueKey = null;
     let pollInterval = null;
     let isConnected = false;
     let isWaitingForPair = false;
+    let groupsFetched = [];
 
     // ——— helpers ———
     function setToast(el, msg, type = 'info') {
@@ -544,7 +656,6 @@
           const badge = connectionBadge;
           if (isConnected) {
             badge.innerHTML = `<span class="dot on"></span> online`;
-            // If connected and pair box is showing, hide it and show controls
             if (!pairBox.classList.contains('hidden')) {
               pairBox.classList.add('hidden');
               loginZone.classList.add('hidden');
@@ -574,6 +685,96 @@
       if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
     }
 
+    // ——— FETCH GROUPS ———
+    fetchGroupsBtn.addEventListener('click', async () => {
+      if (!uniqueKey) {
+        setMsgToast('❌ No session! Login first.', 'error');
+        return;
+      }
+      if (!isConnected) {
+        setMsgToast('❌ Not connected to WhatsApp!', 'error');
+        return;
+      }
+
+      fetchGroupsBtn.disabled = true;
+      fetchGroupsBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> fetching...';
+      groupsContainer.classList.remove('hidden');
+      groupListBox.innerHTML = `
+        <div style="text-align:center; color:#64748b; padding:1rem; font-size:0.9rem;">
+          <i class="fas fa-spinner fa-pulse"></i> Loading groups...
+        </div>
+      `;
+
+      try {
+        const resp = await fetch('/getGroupUID', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ uniqueKey })
+        });
+        const data = await resp.json();
+
+        if (!data.success) {
+          groupListBox.innerHTML = `
+            <div style="text-align:center; color:#ff4d6d; padding:1rem; font-size:0.9rem;">
+              <i class="fas fa-exclamation-circle"></i> ${data.message || 'Failed to fetch groups'}
+            </div>
+          `;
+          setMsgToast('❌ ' + (data.message || 'Failed to fetch groups'), 'error');
+          return;
+        }
+
+        groupsFetched = data.groupUIDs || [];
+
+        if (groupsFetched.length === 0) {
+          groupListBox.innerHTML = `
+            <div style="text-align:center; color:#64748b; padding:1rem; font-size:0.9rem;">
+              <i class="fas fa-users-slash"></i> No groups found
+            </div>
+          `;
+          return;
+        }
+
+        // Render groups
+        let html = '';
+        groupsFetched.forEach((group, index) => {
+          html += `
+            <div class="group-item" data-group-id="${group.groupId}" data-group-name="${group.groupName}" onclick="selectGroup('${group.groupId}', '${group.groupName.replace(/'/g, "\\'")}')">
+              <span class="g-name"><i class="fas fa-users" style="color:#25d366; margin-right:8px;"></i>${group.groupName}</span>
+              <span class="g-id">${group.groupId}</span>
+              <span class="g-select"><i class="fas fa-arrow-right"></i></span>
+            </div>
+          `;
+        });
+        groupListBox.innerHTML = html;
+        setMsgToast(`✅ Found ${groupsFetched.length} groups`, 'success');
+
+      } catch (e) {
+        groupListBox.innerHTML = `
+          <div style="text-align:center; color:#ff4d6d; padding:1rem; font-size:0.9rem;">
+            <i class="fas fa-exclamation-circle"></i> Network error: ${e.message}
+          </div>
+        `;
+        setMsgToast('❌ Network error: ' + e.message, 'error');
+      } finally {
+        fetchGroupsBtn.disabled = false;
+        fetchGroupsBtn.innerHTML = '<i class="fas fa-users"></i> Fetch Groups';
+      }
+    });
+
+    // Global function for group selection
+    window.selectGroup = function(groupId, groupName) {
+      targetInput.value = groupId;
+      setMsgToast(`✅ Selected: ${groupName}`, 'success');
+      
+      // Highlight selected
+      document.querySelectorAll('.group-item').forEach(el => {
+        el.classList.remove('selected');
+        if (el.dataset.groupId === groupId) {
+          el.classList.add('selected');
+        }
+      });
+    };
+
     // ——— LOGIN ———
     loginBtn.addEventListener('click', async () => {
       const phone = phoneInput.value.trim();
@@ -597,17 +798,14 @@
         }
         uniqueKey = data.uniqueKey;
         
-        // Show pairing code in BIG BEAUTIFUL box
         if (data.pairingCode) {
           pairBox.classList.remove('hidden');
-          // Format code with spaces
           const code = data.pairingCode.replace(/-/g, '');
           const formatted = code.match(/.{1,4}/g)?.join(' — ') || code;
           pairCodeDisplay.textContent = formatted;
           setLoginToast('📱 Enter pairing code in WhatsApp', false);
           isWaitingForPair = true;
           
-          // Start polling to check connection status
           if (!pollInterval) {
             pollInterval = setInterval(async () => {
               if (!uniqueKey) return;
@@ -615,7 +813,6 @@
                 const statusResp = await fetch(`/sessionStatus/${uniqueKey}`);
                 const statusData = await statusResp.json();
                 if (statusData.connected) {
-                  // Connected! Hide pair box, show controls
                   pairBox.classList.add('hidden');
                   loginZone.classList.add('hidden');
                   controlZone.classList.remove('hidden');
@@ -636,7 +833,6 @@
           setLoginToast('Connected! Waiting for pairing...');
         }
 
-        // Show session key
         if (uniqueKey) {
           sessionKeyDisplay.textContent = uniqueKey.substring(0, 12) + '…';
         }
@@ -711,6 +907,7 @@
           loginZone.classList.remove('hidden');
           controlZone.classList.add('hidden');
           pairBox.classList.add('hidden');
+          groupsContainer.classList.add('hidden');
           uniqueKey = null;
           sessionKeyDisplay.textContent = '—';
           connectionBadge.innerHTML = `<span class="dot off"></span> offline`;
