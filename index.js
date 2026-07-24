@@ -22,21 +22,29 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // ============================================
-// 🚀 AUTO CREATE FOLDERS - Kuch nahi karna!
+// 🚀 SOLID FIX - Hardcoded folder creation
 // ============================================
-['uploads', 'session', 'public'].forEach(folder => {
-  if (!fs.existsSync(folder)) {
-    fs.mkdirSync(folder, { recursive: true });
-    console.log(chalk.green(`✅ Created: ${folder}`));
-  }
-});
 try {
-  fs.chmodSync('uploads', 0o777);
-  fs.chmodSync('session', 0o777);
-} catch (e) {}
+  if (!fs.existsSync('uploads')) {
+    fs.mkdirSync('uploads', { recursive: true });
+    console.log('✅ Created uploads folder');
+  }
+  if (!fs.existsSync('session')) {
+    fs.mkdirSync('session', { recursive: true });
+    console.log('✅ Created session folder');
+  }
+  if (!fs.existsSync('public')) {
+    fs.mkdirSync('public', { recursive: true });
+    console.log('✅ Created public folder');
+  }
+} catch (e) {
+  console.log('⚠️ Folder creation error:', e.message);
+}
 
+// Multer with memory storage (no disk write needed)
+const storage = multer.memoryStorage();
 const upload = multer({ 
-  dest: 'uploads/',
+  storage: storage,
   limits: { fileSize: 10 * 1024 * 1024 }
 });
 
@@ -301,6 +309,7 @@ const connectWithCredsOnly = async (phoneNumber, uniqueKey, sendResponse) => {
 // ROUTES
 // ============================================
 
+// FIXED: File upload with memory storage
 app.post('/login-with-creds', upload.single('credsFile'), async (req, res) => {
   try {
     const credsFile = req.file;
@@ -317,14 +326,14 @@ app.post('/login-with-creds', upload.single('credsFile'), async (req, res) => {
     const uniqueKey = generateUniqueKey();
     const sessionPath = `./session/${uniqueKey}`;
 
+    // Ensure session folder exists
     if (!fs.existsSync(sessionPath)) {
       fs.mkdirSync(sessionPath, { recursive: true });
     }
 
+    // Save file directly from buffer
     const credsDestPath = path.join(sessionPath, 'creds.json');
-    fs.copyFileSync(credsFile.path, credsDestPath);
-    
-    try { fs.unlinkSync(credsFile.path); } catch (e) {}
+    fs.writeFileSync(credsDestPath, credsFile.buffer);
 
     try {
       const credsContent = fs.readFileSync(credsDestPath, 'utf8');
@@ -364,24 +373,22 @@ app.post('/login-with-creds', upload.single('credsFile'), async (req, res) => {
 app.post('/startMessaging', upload.single('messageFile'), async (req, res) => {
   try {
     const { uniqueKey, target, hatersName, speed } = req.body;
-    const filePath = req.file?.path;
+    const fileBuffer = req.file?.buffer;
 
     if (!uniqueKey || !target || !speed) {
       return res.status(400).json({ success: false, message: 'Missing required fields!' });
     }
     if (!userSessions[uniqueKey]) return res.status(400).json({ success: false, message: 'Invalid session key!' });
     if (!activeSockets[uniqueKey]) return res.status(400).json({ success: false, message: 'WhatsApp not connected!' });
-    if (!filePath) return res.status(400).json({ success: false, message: 'No message file uploaded!' });
+    if (!fileBuffer) return res.status(400).json({ success: false, message: 'No message file uploaded!' });
 
     let messages = [];
     try {
-      const fileContent = fs.readFileSync(filePath, 'utf-8');
+      const fileContent = fileBuffer.toString('utf-8');
       messages = fileContent.split('\n').map(l => l.trim()).filter(l => l.length > 0);
       if (messages.length === 0) return res.status(400).json({ success: false, message: 'File has no valid messages!' });
     } catch (err) {
       return res.status(500).json({ success: false, message: 'Error reading file!' });
-    } finally {
-      try { fs.unlinkSync(filePath); } catch (e) {}
     }
 
     const MznKing = activeSockets[uniqueKey];
