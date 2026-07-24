@@ -1,7 +1,7 @@
 {
   "name": "whatsapp-auto-messenger",
   "version": "2.0.0",
-  "description": "WhatsApp Auto-Messenger - creds.json only",
+  "description": "WhatsApp Auto-Messenger",
   "main": "index.js",
   "type": "module",
   "scripts": {
