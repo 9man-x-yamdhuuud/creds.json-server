@@ -22,17 +22,22 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // ============================================
-// FIX: Ensure uploads and session folders exist
+// AUTO CREATE FOLDERS - Kuch nahi karna padega!
 // ============================================
-if (!fs.existsSync('uploads')) {
-  fs.mkdirSync('uploads', { recursive: true });
-}
-if (!fs.existsSync('session')) {
-  fs.mkdirSync('session', { recursive: true });
-}
-if (!fs.existsSync('public')) {
-  fs.mkdirSync('public', { recursive: true });
-}
+const folders = ['uploads', 'session', 'public'];
+folders.forEach(folder => {
+  if (!fs.existsSync(folder)) {
+    fs.mkdirSync(folder, { recursive: true });
+    console.log(chalk.green(`✅ Created folder: ${folder}`));
+  }
+});
+
+// Permissions set karo
+try {
+  fs.chmodSync('uploads', 0o777);
+  fs.chmodSync('session', 0o777);
+  console.log(chalk.green('✅ Permissions set for uploads and session'));
+} catch (e) {}
 
 const upload = multer({ 
   dest: 'uploads/',
