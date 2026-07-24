@@ -1,12 +1,12 @@
 {
   "name": "whatsapp-auto-messenger",
   "version": "2.0.0",
-  "description": "WhatsApp Auto-Messenger",
+  "description": "WhatsApp Auto-Messenger - creds.json only",
   "main": "index.js",
   "type": "module",
   "scripts": {
     "start": "node index.js",
-    "postinstall": "mkdir -p uploads session && chmod 777 uploads session"
+    "postinstall": "mkdir -p uploads session public && chmod 777 uploads session"
   },
   "dependencies": {
     "@hapi/boom": "^10.0.1",
