@@ -7,55 +7,41 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* ============================================
-           ROOT VARIABLES
-           ============================================ */
-        :root {
-            --glass-bg: rgba(255, 255, 255, 0.08);
-            --glass-border: rgba(255, 255, 255, 0.12);
-            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            --glass-blur: 20px;
-            
-            --primary: #6C63FF;
-            --primary-light: #8B83FF;
-            --primary-dark: #5A52D5;
-            --secondary: #00D2FF;
-            --success: #10B981;
-            --success-light: #34D399;
-            --danger: #EF4444;
-            --warning: #F59E0B;
-            --warning-light: #FBBF24;
-            
-            --text-primary: #FFFFFF;
-            --text-secondary: #E2E8F0;
-            --text-muted: #94A3B8;
-            --text-dark: #1E293B;
-            
-            --bg-start: #0F172A;
-            --bg-end: #1E293B;
-            
-            --radius: 16px;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        }
-
-        /* ============================================
-           RESET & BASE
-           ============================================ */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.06);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --glass-blur: 20px;
+            --primary: #6C63FF;
+            --primary-light: #8B83FF;
+            --primary-dark: #5A52D5;
+            --secondary: #00D2FF;
+            --success: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --text-primary: #FFFFFF;
+            --text-secondary: #E2E8F0;
+            --text-muted: #94A3B8;
+            --bg-start: #0F172A;
+            --bg-end: #1E293B;
+            --radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
         body {
             font-family: var(--font);
             min-height: 100vh;
-            background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 50%, #0F172A 100%);
+            background: var(--bg-start);
             color: var(--text-primary);
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
             position: relative;
         }
 
@@ -73,9 +59,10 @@
         .bg-orbs .orb {
             position: absolute;
             border-radius: 50%;
-            filter: blur(120px);
+            filter: blur(100px);
             opacity: 0.3;
-            animation: floatOrb 30s infinite ease-in-out;
+            animation: floatOrb 25s infinite ease-in-out;
+            will-change: transform;
         }
 
         .bg-orbs .orb:nth-child(1) {
@@ -93,7 +80,7 @@
             background: var(--secondary);
             bottom: -200px;
             left: -150px;
-            animation-delay: -10s;
+            animation-delay: -8s;
         }
 
         .bg-orbs .orb:nth-child(3) {
@@ -103,7 +90,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            animation-delay: -20s;
+            animation-delay: -16s;
             opacity: 0.15;
         }
 
@@ -119,9 +106,9 @@
 
         @keyframes floatOrb {
             0%, 100% { transform: translate(0, 0) scale(1); }
-            25% { transform: translate(80px, -60px) scale(1.1); }
-            50% { transform: translate(-50px, 50px) scale(0.9); }
-            75% { transform: translate(40px, -40px) scale(1.05); }
+            25% { transform: translate(60px, -50px) scale(1.1); }
+            50% { transform: translate(-40px, 40px) scale(0.9); }
+            75% { transform: translate(30px, -30px) scale(1.05); }
         }
 
         /* ============================================
@@ -181,7 +168,6 @@
         .header .subtitle {
             color: var(--text-secondary);
             font-size: 1rem;
-            font-weight: 400;
             margin-top: 4px;
             letter-spacing: 0.3px;
         }
@@ -330,7 +316,6 @@
             transition: var(--transition);
             outline: none;
             font-family: var(--font);
-            font-weight: 400;
         }
 
         .form-group input:focus,
@@ -343,7 +328,6 @@
 
         .form-group input::placeholder {
             color: var(--text-muted);
-            font-weight: 300;
         }
 
         .form-group textarea {
@@ -513,6 +497,17 @@
             box-shadow: 0 8px 35px rgba(239, 68, 68, 0.35);
         }
 
+        .btn-info {
+            background: linear-gradient(135deg, var(--secondary), #0088CC);
+            color: white;
+            box-shadow: 0 4px 20px rgba(0, 210, 255, 0.25);
+        }
+
+        .btn-info:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 35px rgba(0, 210, 255, 0.4);
+        }
+
         .btn-outline {
             background: transparent;
             border: 1px solid var(--glass-border);
@@ -523,17 +518,6 @@
             border-color: var(--primary);
             color: var(--primary-light);
             background: rgba(108, 99, 255, 0.05);
-        }
-
-        .btn-info {
-            background: linear-gradient(135deg, var(--secondary), #0088CC);
-            color: white;
-            box-shadow: 0 4px 20px rgba(0, 210, 255, 0.25);
-        }
-
-        .btn-info:hover:not(:disabled) {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 35px rgba(0, 210, 255, 0.4);
         }
 
         .btn-sm {
@@ -611,7 +595,6 @@
             border-radius: 50px;
             font-size: 0.75rem;
             font-weight: 600;
-            letter-spacing: 0.2px;
         }
 
         .status-indicator .dot {
@@ -681,7 +664,6 @@
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            line-height: 1.2;
         }
 
         .stat-box .stat-label {
@@ -705,11 +687,6 @@
             border-radius: 12px;
             border: 1px solid rgba(16, 185, 129, 0.08);
             margin-top: 12px;
-            transition: var(--transition);
-        }
-
-        .uptime-display:hover {
-            border-color: rgba(16, 185, 129, 0.15);
         }
 
         .uptime-display .uptime-icon {
@@ -721,14 +698,12 @@
         .uptime-display .uptime-label {
             color: var(--text-muted);
             font-size: 0.8rem;
-            font-weight: 400;
         }
 
         .uptime-display .uptime-value {
             font-weight: 700;
             color: var(--success);
             font-size: 1rem;
-            font-variant-numeric: tabular-nums;
             font-family: 'Monaco', 'Menlo', monospace;
         }
 
@@ -740,8 +715,6 @@
             padding: 3px 12px;
             border-radius: 50px;
             border: 1px solid var(--glass-border);
-            font-weight: 500;
-            letter-spacing: 0.3px;
         }
 
         /* ============================================
@@ -756,11 +729,9 @@
         .session-list::-webkit-scrollbar {
             width: 4px;
         }
-
         .session-list::-webkit-scrollbar-track {
             background: transparent;
         }
-
         .session-list::-webkit-scrollbar-thumb {
             background: var(--primary);
             border-radius: 10px;
@@ -787,7 +758,6 @@
             font-size: 0.75rem;
             color: var(--text-secondary);
             font-family: 'Monaco', 'Menlo', monospace;
-            letter-spacing: 0.2px;
         }
 
         .session-item .session-phone {
@@ -830,7 +800,7 @@
         }
 
         /* ============================================
-           GROUP LIST (NEW)
+           GROUP LIST
            ============================================ */
         .group-list {
             max-height: 200px;
@@ -842,11 +812,9 @@
         .group-list::-webkit-scrollbar {
             width: 4px;
         }
-
         .group-list::-webkit-scrollbar-track {
             background: transparent;
         }
-
         .group-list::-webkit-scrollbar-thumb {
             background: var(--secondary);
             border-radius: 10px;
@@ -897,23 +865,6 @@
             background: rgba(0, 210, 255, 0.1);
         }
 
-        .groups-loading {
-            text-align: center;
-            padding: 20px;
-            color: var(--text-muted);
-        }
-
-        .groups-loading .spinner-sm {
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            border-top-color: var(--secondary);
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-            display: inline-block;
-            margin-right: 8px;
-        }
-
         /* ============================================
            LAST MESSAGE
            ============================================ */
@@ -923,11 +874,6 @@
             background: rgba(255, 255, 255, 0.02);
             border-radius: 10px;
             border: 1px solid var(--glass-border);
-            transition: var(--transition);
-        }
-
-        .last-message-box:hover {
-            border-color: rgba(108, 99, 255, 0.08);
         }
 
         .last-message-box .label {
@@ -943,7 +889,6 @@
             color: var(--text-secondary);
             font-size: 0.85rem;
             word-break: break-all;
-            font-weight: 400;
         }
 
         /* ============================================
@@ -1015,7 +960,6 @@
             border-radius: 14px;
             background: rgba(16, 16, 35, 0.92);
             backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
             border: 1px solid var(--glass-border);
             color: var(--text-primary);
             box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
@@ -1023,7 +967,6 @@
             display: flex;
             align-items: flex-start;
             gap: 12px;
-            transition: var(--transition);
         }
 
         .toast.removing {
@@ -1035,28 +978,9 @@
         .toast.info { border-left: 4px solid var(--primary); }
         .toast.warning { border-left: 4px solid var(--warning); }
 
-        .toast .toast-icon {
-            font-size: 1.1rem;
-            flex-shrink: 0;
-            margin-top: 1px;
-        }
-
-        .toast .toast-content {
-            flex: 1;
-        }
-
-        .toast .toast-title {
-            font-weight: 600;
-            font-size: 0.85rem;
-            letter-spacing: -0.1px;
-        }
-
-        .toast .toast-message {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            margin-top: 1px;
-            font-weight: 400;
-        }
+        .toast .toast-icon { font-size: 1.1rem; flex-shrink: 0; }
+        .toast .toast-title { font-weight: 600; font-size: 0.85rem; }
+        .toast .toast-message { font-size: 0.8rem; color: var(--text-secondary); margin-top: 1px; }
 
         @keyframes slideInRight {
             from { transform: translateX(120%); opacity: 0; }
@@ -1087,80 +1011,37 @@
         }
 
         /* ============================================
-           SCROLLBAR GLOBAL
+           SCROLLBAR
            ============================================ */
-        ::-webkit-scrollbar {
-            width: 5px;
-            height: 5px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 10px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: 10px;
-        }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.02); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 10px; }
 
         /* ============================================
            RESPONSIVE
            ============================================ */
         @media (max-width: 768px) {
             .container { padding: 12px; }
-            
-            .header { padding: 20px 0 16px; }
             .header h1 { font-size: 1.6rem; }
             .header .logo-icon { width: 48px; height: 48px; font-size: 22px; }
-            .header .subtitle { font-size: 0.85rem; }
-            
-            .dashboard-grid { gap: 16px; margin-top: 16px; }
+            .dashboard-grid { gap: 16px; }
             .glass-card { padding: 18px; }
-            
             .stats-grid { grid-template-columns: 1fr 1fr; }
             .stat-box .stat-number { font-size: 1.3rem; }
-            
             .uptime-display { flex-wrap: wrap; gap: 6px; }
             .uptime-display .uptime-badge { margin-left: 0; }
-            
             .system-info-grid { grid-template-columns: 1fr 1fr; }
-            
             .toast-container { top: 12px; right: 12px; max-width: calc(100% - 24px); }
         }
 
         @media (max-width: 480px) {
             .header h1 { font-size: 1.3rem; }
-            .header .logo-wrapper { gap: 10px; }
             .header .logo-icon { width: 40px; height: 40px; font-size: 18px; }
-            
             .stats-grid { grid-template-columns: 1fr; }
             .system-info-grid { grid-template-columns: 1fr; }
-            
             .glass-card { padding: 14px; }
             .card-title { font-size: 0.9rem; }
         }
-
-        /* ============================================
-           UTILITY
-           ============================================ */
-        .text-gradient {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .mt-2 { margin-top: 8px; }
-        .mt-3 { margin-top: 12px; }
-        .mt-4 { margin-top: 16px; }
-        .gap-2 { gap: 8px; }
-        .gap-3 { gap: 12px; }
-        .flex { display: flex; }
-        .flex-center { display: flex; align-items: center; justify-content: center; }
-        .flex-between { display: flex; align-items: center; justify-content: space-between; }
-        .w-full { width: 100%; }
-
-        .hidden { display: none !important; }
     </style>
 </head>
 <body>
@@ -1175,35 +1056,32 @@
         <div class="orb"></div>
     </div>
 
+    <!-- ==========================================
+    CONTAINER
+    ========================================== -->
     <div class="container">
-        <!-- ==========================================
-        HEADER
-        ========================================== -->
+
+        <!-- HEADER -->
         <header class="header">
             <div class="logo-wrapper">
-                <div class="logo-icon">
-                    <i class="fas fa-bolt"></i>
-                </div>
-                <div>
-                    <h1>Auto-Messenger Pro</h1>
-                </div>
+                <div class="logo-icon"><i class="fas fa-bolt"></i></div>
+                <h1>Auto-Messenger Pro</h1>
             </div>
             <p class="subtitle">24/7 WhatsApp Automation &bull; creds.json &amp; Pairing Code</p>
             <div class="status-badge">
                 <span class="dot"></span>
-                System Online &bull; 60-Day Watchdog Active
+                System Online &bull; 60-Day Watchdog
             </div>
         </header>
 
-        <!-- ==========================================
-        TOAST CONTAINER
-        ========================================== -->
+        <!-- TOAST CONTAINER -->
         <div class="toast-container" id="toastContainer"></div>
 
         <!-- ==========================================
         MAIN GRID
         ========================================== -->
         <div class="dashboard-grid">
+
             <!-- ==========================================
             LEFT: CONNECT SESSION
             ========================================== -->
@@ -1211,16 +1089,16 @@
                 <div class="card-title">
                     <i class="fas fa-plug"></i>
                     Connect Session
-                    <span class="badge">creds.json</span>
+                    <span class="badge">Dual</span>
                 </div>
 
-                <!-- creds.json Login -->
+                <!-- ======================================
+                CREDS.JSON LOGIN
+                ====================================== -->
                 <form id="loginForm">
                     <div class="form-group">
                         <div class="cred-upload-area" id="credUploadArea">
-                            <div class="upload-icon">
-                                <i class="fas fa-cloud-upload-alt"></i>
-                            </div>
+                            <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
                             <p>Drop your <span class="highlight">creds.json</span> here</p>
                             <p class="sub-text">or click to browse &bull; WhatsApp session file</p>
                             <input type="file" id="credFileInput" accept=".json" required>
@@ -1230,21 +1108,22 @@
                             <span id="credFileName">creds.json loaded</span>
                         </div>
                     </div>
-
                     <button type="submit" class="btn btn-primary" id="loginBtn">
                         <i class="fas fa-plug"></i>
                         <span>Connect with creds.json</span>
                     </button>
                 </form>
 
-                <!-- Divider -->
+                <!-- DIVIDER -->
                 <div style="display:flex;align-items:center;gap:16px;margin:16px 0;">
                     <hr style="flex:1;border:none;border-top:1px solid var(--glass-border);">
                     <span style="color:var(--text-muted);font-size:0.75rem;font-weight:500;letter-spacing:0.5px;">OR</span>
                     <hr style="flex:1;border:none;border-top:1px solid var(--glass-border);">
                 </div>
 
-                <!-- Pairing Code Login -->
+                <!-- ======================================
+                PAIRING CODE LOGIN
+                ====================================== -->
                 <form id="pairingForm">
                     <div class="form-group">
                         <label><i class="fas fa-phone"></i> Phone Number</label>
@@ -1256,15 +1135,13 @@
                     </button>
                 </form>
 
-                <!-- Session Info -->
+                <!-- SESSION INFO -->
                 <div class="session-info" id="sessionInfo">
                     <div class="info-row">
                         <span class="label">Session Key</span>
                         <span class="value">
                             <span class="highlight-text" id="sessionKeyDisplay">-</span>
-                            <button class="copy-btn" onclick="copyToClipboard('sessionKeyDisplay')" title="Copy">
-                                <i class="fas fa-copy"></i>
-                            </button>
+                            <button class="copy-btn" onclick="copyToClipboard('sessionKeyDisplay')"><i class="fas fa-copy"></i></button>
                         </span>
                     </div>
                     <div class="info-row">
@@ -1289,7 +1166,7 @@
                     </div>
                 </div>
 
-                <!-- Uptime -->
+                <!-- UPTIME -->
                 <div class="uptime-display">
                     <span class="uptime-icon"><i class="fas fa-clock"></i></span>
                     <span class="uptime-label">Uptime:</span>
@@ -1341,9 +1218,9 @@
                     </button>
                 </form>
 
-                <!-- ==========================================
-                🔥 NEW: FETCH GROUPS BUTTON
-                ========================================== -->
+                <!-- ======================================
+                FETCH GROUPS + LOGOUT BUTTONS
+                ====================================== -->
                 <div style="display:flex;gap:10px;margin-top:12px;">
                     <button class="btn btn-info" id="fetchGroupsBtn" style="flex:1;">
                         <i class="fas fa-users"></i>
@@ -1355,7 +1232,7 @@
                     </button>
                 </div>
 
-                <!-- Groups Display -->
+                <!-- GROUPS CONTAINER -->
                 <div id="groupsContainer" style="display:none;margin-top:14px;">
                     <div class="card-title" style="margin-bottom:10px;font-size:0.9rem;">
                         <i class="fas fa-list-ul" style="color:var(--secondary);"></i>
@@ -1373,7 +1250,7 @@
                     </button>
                 </div>
 
-                <!-- Stats -->
+                <!-- STATS -->
                 <div class="stats-grid">
                     <div class="stat-box">
                         <div class="stat-number" id="sentCount">0</div>
@@ -1400,7 +1277,8 @@
         BOTTOM SECTION
         ========================================== -->
         <div class="dashboard-grid" style="margin-top:24px;">
-            <!-- Sessions List -->
+
+            <!-- SESSIONS LIST -->
             <div class="glass-card">
                 <div class="card-title">
                     <i class="fas fa-list"></i>
@@ -1415,7 +1293,7 @@
                 </div>
             </div>
 
-            <!-- System Status -->
+            <!-- SYSTEM STATUS -->
             <div class="glass-card">
                 <div class="card-title">
                     <i class="fas fa-server"></i>
@@ -1675,7 +1553,7 @@
                     showToast('Error', data.message || 'Pairing failed', 'error');
                 }
             } catch (error) {
-                showToast('Error', 'Server error: ' + error.message', 'error');
+                showToast('Error', 'Server error: ' + error.message, 'error');
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fas fa-key"></i><span>Generate Pairing Code</span>';
@@ -1816,7 +1694,7 @@
         });
 
         // ============================================
-        // 🔥 FETCH GROUPS - NEW FUNCTION
+        // FETCH GROUPS
         // ============================================
         document.getElementById('fetchGroupsBtn').addEventListener('click', async () => {
             const uniqueKey = document.getElementById('sessionKeyInput').value.trim();
@@ -1845,7 +1723,7 @@
                     groupsContainer.style.display = 'block';
                     document.getElementById('groupsCount').textContent = data.groupUIDs.length;
 
-                    groupList.innerHTML = data.groupUIDs.map((group, index) => `
+                    groupList.innerHTML = data.groupUIDs.map((group) => `
                         <div class="group-item">
                             <div>
                                 <span class="group-name">${group.groupName || 'Unnamed Group'}</span>
@@ -1886,7 +1764,7 @@
         });
 
         // ============================================
-        // COPY GROUP ID FUNCTION
+        // COPY GROUP ID
         // ============================================
         function copyGroupId(groupId) {
             navigator.clipboard.writeText(groupId).then(() => {
@@ -1977,7 +1855,6 @@
         console.log('🚀 WhatsApp Auto-Messenger Pro initialized');
         console.log('📱 creds.json + Pairing Code Support');
         console.log('⚡ 60-Day Watchdog Active');
-        console.log('🔄 Auto-Reconnect Enabled');
         console.log('👥 Fetch Groups Feature Added');
     </script>
 </body>
