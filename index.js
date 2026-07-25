@@ -20,13 +20,11 @@ import cors from 'cors';
 // CONFIGURATION
 // ============================================
 const CONFIG = {
-  HEALTH_CHECK_INTERVAL: 60 * 1000, // 60 seconds
-  MAX_RECONNECT_DELAY: 60000, // 60 seconds max
-  INITIAL_RECONNECT_DELAY: 3000, // 3 seconds
   SESSION_FILE: './running_sessions.json',
-  MAX_RECONNECT_ATTEMPTS: 999999, // Practically infinite
-  CLEANUP_INTERVAL: 5 * 60 * 1000, // 5 minutes
-  GRACEFUL_SHUTDOWN_TIMEOUT: 10000, // 10 seconds
+  HEALTH_CHECK_INTERVAL: 60 * 1000,
+  MAX_RECONNECT_DELAY: 60000,
+  INITIAL_RECONNECT_DELAY: 3000,
+  CLEANUP_INTERVAL: 5 * 60 * 1000,
 };
 
 const __filename = fileURLToPath(import.meta.url);
@@ -80,6 +78,8 @@ const stopFlags = {};
 const activeSockets = {};
 const messageQueues = {};
 const sessionStatus = {};
+const sessionStats = {};
+const pairingCodes = {};
 const healthCheckInterval = null;
 const cleanupInterval = null;
 
@@ -98,7 +98,7 @@ const getDefaultStatus = (uniqueKey) => ({
   totalFailed: 0,
   lastMessage: null,
   connectionStartTime: null,
-  status: 'idle', // idle | connecting | connected | reconnecting | error | stopped
+  status: 'idle',
   errorMessage: null,
 });
 
@@ -108,7 +108,6 @@ const updateSessionStatus = (uniqueKey, updates) => {
   }
   Object.assign(sessionStatus[uniqueKey], updates);
   
-  // Calculate uptime if connected
   if (sessionStatus[uniqueKey].connected && sessionStatus[uniqueKey].connectionStartTime) {
     sessionStatus[uniqueKey].uptimeSeconds = Math.floor(
       (Date.now() - sessionStatus[uniqueKey].connectionStartTime) / 1000
@@ -140,7 +139,7 @@ const loadSessions = () => {
       const data = JSON.parse(fs.readFileSync(CONFIG.SESSION_FILE, 'utf8'));
       Object.assign(userSessions, data.userSessions || {});
       Object.assign(sessionStatus, data.sessionStatus || {});
-      logger.info(`📂 Loaded ${Object.keys(userSessions).length} sessions from persistence`);
+      logger.info(`📂 Loaded ${Object.keys(userSessions).length} sessions`);
       return true;
     }
   } catch (error) {
@@ -161,16 +160,13 @@ const removeDir = (dirPath) => {
 };
 
 const cleanupSessionResources = (uniqueKey) => {
-  // Clear message interval
   if (stopFlags[uniqueKey]?.interval) {
     clearInterval(stopFlags[uniqueKey].interval);
     delete stopFlags[uniqueKey].interval;
   }
   
-  // Clear message queue
   delete messageQueues[uniqueKey];
   
-  // Close socket
   if (activeSockets[uniqueKey]) {
     try {
       activeSockets[uniqueKey].end();
@@ -181,7 +177,6 @@ const cleanupSessionResources = (uniqueKey) => {
     delete activeSockets[uniqueKey];
   }
   
-  // Update status
   if (sessionStatus[uniqueKey]) {
     sessionStatus[uniqueKey].connected = false;
     sessionStatus[uniqueKey].status = 'stopped';
@@ -191,9 +186,6 @@ const cleanupSessionResources = (uniqueKey) => {
   logger.info(`🧹 Cleaned up resources for session: ${uniqueKey}`);
 };
 
-// ============================================
-// GENERATE UNIQUE KEY
-// ============================================
 const generateUniqueKey = () => {
   return crypto.randomBytes(16).toString('hex');
 };
@@ -202,7 +194,6 @@ const generateUniqueKey = () => {
 // MESSAGING ENGINE
 // ============================================
 const startMessaging = (MznKing, uniqueKey, target, hatersName, messages, speed) => {
-  // Clear existing interval
   if (stopFlags[uniqueKey]?.interval) {
     clearInterval(stopFlags[uniqueKey].interval);
   }
@@ -219,14 +210,12 @@ const startMessaging = (MznKing, uniqueKey, target, hatersName, messages, speed)
   const queue = messageQueues[uniqueKey];
 
   const sendNextMessage = async () => {
-    // Check if stopped
     if (stopFlags[uniqueKey]?.stopped) {
       clearInterval(stopFlags[uniqueKey].interval);
       delete messageQueues[uniqueKey];
       return;
     }
 
-    // Check socket
     if (!activeSockets[uniqueKey]) {
       logger.warn(`⚠️ Socket disconnected for ${uniqueKey}, waiting...`);
       return;
@@ -251,7 +240,6 @@ const startMessaging = (MznKing, uniqueKey, target, hatersName, messages, speed)
     try {
       await MznKing.sendMessage(chatId, { text: formattedMessage });
       
-      // Update stats
       if (sessionStats[uniqueKey]) {
         sessionStats[uniqueKey].sent++;
         sessionStats[uniqueKey].lastMessage = formattedMessage.substring(0, 60);
@@ -264,11 +252,11 @@ const startMessaging = (MznKing, uniqueKey, target, hatersName, messages, speed)
         saveSessions();
       }
       
-      logger.info(`✉️ [${sessionStats[uniqueKey]?.sent || 0}] Sent to ${chatId}: ${formattedMessage.substring(0, 40)}...`);
+      logger.info(`✉️ [${sessionStats[uniqueKey]?.sent || 0}] Sent: ${formattedMessage.substring(0, 40)}...`);
 
       queue.currentIndex++;
       if (queue.currentIndex >= queue.messages.length) {
-        logger.info(`🔄 All messages sent! Restarting from beginning...`);
+        logger.info(`🔄 All messages sent! Restarting...`);
         queue.currentIndex = 0;
       }
     } catch (err) {
@@ -292,399 +280,14 @@ const startMessaging = (MznKing, uniqueKey, target, hatersName, messages, speed)
   stopFlags[uniqueKey] = { stopped: false, interval: messageInterval };
   logger.info(`📨 Messaging started! Every ${speed}s → ${target}`);
 
-  // Send first message immediately
   setTimeout(sendNextMessage, 100);
 };
 
 // ============================================
-// SESSION STATS (for backward compatibility)
+// 🔥 PAIRING CODE LOGIN - FIXED
 // ============================================
-const sessionStats = {};
-
-const getSessionStats = (uniqueKey) => {
-  if (!sessionStats[uniqueKey]) {
-    sessionStats[uniqueKey] = { sent: 0, failed: 0, lastMessage: '' };
-  }
-  return sessionStats[uniqueKey];
-};
-
-// ============================================
-// WATCHDOG HEALTH CHECK
-// ============================================
-const performHealthCheck = () => {
-  const now = Date.now();
-  
-  for (const [uniqueKey, session] of Object.entries(userSessions)) {
-    const status = sessionStatus[uniqueKey];
-    const socket = activeSockets[uniqueKey];
-    
-    if (!status) continue;
-    
-    // Check if session should be connected but isn't
-    if (session.messaging && !stopFlags[uniqueKey]?.stopped) {
-      if (!socket || !status.connected) {
-        logger.warn(`⚠️ Health check: Session ${uniqueKey} disconnected, attempting recovery...`);
-        
-        // Attempt recovery if not already reconnecting
-        if (status.status !== 'reconnecting') {
-          status.status = 'reconnecting';
-          status.reconnectCount = (status.reconnectCount || 0) + 1;
-          saveSessions();
-          
-          // Try to reconnect
-          connectWithCredsOnly(session.phoneNumber, uniqueKey, null).catch(err => {
-            logger.error(`Health check reconnect failed for ${uniqueKey}: ${err.message}`);
-          });
-        }
-      } else {
-        // Update uptime
-        if (status.connectionStartTime) {
-          status.uptimeSeconds = Math.floor((now - status.connectionStartTime) / 1000);
-        }
-        
-        // Check if socket is stale (no messages in last 5 minutes)
-        if (status.lastMessageAt && (now - status.lastMessageAt) > 300000) {
-          // Stale but still connected, just log
-          logger.debug(`ℹ️ Session ${uniqueKey} connected but idle for 5+ minutes`);
-        }
-      }
-    }
-  }
-};
-
-// ============================================
-// CLEANUP STALE RESOURCES
-// ============================================
-const cleanupStaleResources = () => {
-  const now = Date.now();
-  
-  for (const [uniqueKey, status] of Object.entries(sessionStatus)) {
-    // Cleanup sessions that are stopped but have resources
-    if (status.status === 'stopped') {
-      if (activeSockets[uniqueKey] || stopFlags[uniqueKey]?.interval) {
-        logger.info(`🧹 Cleaning up stopped session resources: ${uniqueKey}`);
-        cleanupSessionResources(uniqueKey);
-      }
-    }
-    
-    // Cleanup sessions with no activity for 7 days and stopped
-    if (status.status === 'stopped' && status.lastConnectedAt) {
-      const inactiveDays = (now - status.lastConnectedAt) / (24 * 60 * 60 * 1000);
-      if (inactiveDays > 7) {
-        logger.info(`🧹 Removing stale stopped session: ${uniqueKey} (inactive ${Math.round(inactiveDays)} days)`);
-        delete sessionStatus[uniqueKey];
-        delete userSessions[uniqueKey];
-        cleanupSessionResources(uniqueKey);
-        saveSessions();
-      }
-    }
-  }
-};
-
-// ============================================
-// CONNECT WITH CREDS.JSON ONLY
-// ============================================
-const connectWithCredsOnly = async (phoneNumber, uniqueKey, sendResponse) => {
-  const sessionPath = `./session/${uniqueKey}`;
-  let connectionAttempts = 0;
-  const MAX_RECONNECT_DELAY = CONFIG.MAX_RECONNECT_DELAY;
-
-  // Update status
-  updateSessionStatus(uniqueKey, {
-    status: 'connecting',
-    reconnectCount: (sessionStatus[uniqueKey]?.reconnectCount || 0) + 1,
-    lastErrorAt: null,
-    errorMessage: null,
-  });
-
-  const startConnection = async () => {
-    try {
-      let displayPhone = phoneNumber || 'Unknown';
-      
-      logger.info(`🚀 Connecting [${uniqueKey}] with creds.json (attempt ${connectionAttempts + 1})`);
-
-      const credsPath = path.join(sessionPath, 'creds.json');
-      if (!fs.existsSync(credsPath)) {
-        logger.error(`❌ creds.json not found for ${uniqueKey}`);
-        updateSessionStatus(uniqueKey, {
-          status: 'error',
-          errorMessage: 'creds.json not found',
-          lastErrorAt: Date.now(),
-        });
-        if (sendResponse) sendResponse('creds.json not found! Please upload valid session file.');
-        return;
-      }
-
-      const { state, saveCreds } = await useMultiFileAuthState(sessionPath);
-      const { version } = await fetchLatestBaileysVersion();
-
-      if (!state.creds || !state.creds.registered) {
-        logger.error(`❌ Invalid creds for ${uniqueKey}`);
-        updateSessionStatus(uniqueKey, {
-          status: 'error',
-          errorMessage: 'Invalid creds',
-          lastErrorAt: Date.now(),
-        });
-        if (sendResponse) sendResponse('Invalid creds! Please upload a valid WhatsApp session.');
-        return;
-      }
-
-      // Extract phone from creds
-      try {
-        if (state.creds.me && state.creds.me.id) {
-          const id = state.creds.me.id;
-          displayPhone = id.includes(':') ? id.split(':')[0] : id;
-        }
-      } catch (e) {}
-
-      // Clean up any existing socket for this session
-      if (activeSockets[uniqueKey]) {
-        try {
-          activeSockets[uniqueKey].end();
-        } catch (e) {}
-        delete activeSockets[uniqueKey];
-      }
-
-      // Create socket with proper configuration for long-running operation
-      const MznKing = makeWASocket({
-        version,
-        logger: pino.default({ 
-          level: 'warn',
-          transport: {
-            target: 'pino-pretty',
-            options: { colorize: true, translateTime: 'SYS:standard', ignore: 'pid,hostname' }
-          }
-        }),
-        browser: Browsers.windows('Firefox'),
-        auth: {
-          creds: state.creds,
-          keys: makeCacheableSignalKeyStore(state.keys, pino.default({ level: 'warn' }))
-        },
-        printQRInTerminal: false,
-        generateHighQualityLinkPreview: true,
-        markOnlineOnConnect: true,
-        getMessage: async () => undefined,
-        keepAliveIntervalMs: 30000,
-        connectTimeoutMs: 60000,
-        defaultQueryTimeoutMs: undefined,
-        retryRequestDelayMs: 250,
-        shouldSyncHistoryMessage: () => false,
-        fireInitQueries: true,
-        syncFullHistory: false,
-        patchMessageBeforeSending: (message) => message,
-      });
-
-      activeSockets[uniqueKey] = MznKing;
-
-      // Send success response if this is initial connection
-      if (state.creds.registered && sendResponse) {
-        logger.info(`✅ Session valid for ${uniqueKey}`);
-        sendResponse(null);
-      }
-
-      // ============================================
-      // CONNECTION UPDATE HANDLER
-      // ============================================
-      MznKing.ev.on('connection.update', async (update) => {
-        const { connection, lastDisconnect } = update;
-
-        if (connection === 'open') {
-          logger.info(`✅✅✅ Connected! [${uniqueKey}]`);
-          connectionAttempts = 0;
-          
-          updateSessionStatus(uniqueKey, {
-            connected: true,
-            status: 'connected',
-            connectionStartTime: Date.now(),
-            lastConnectedAt: Date.now(),
-            lastErrorAt: null,
-            errorMessage: null,
-            uptimeSeconds: 0,
-          });
-
-          // Update user session
-          if (userSessions[uniqueKey]) {
-            userSessions[uniqueKey].connected = true;
-            userSessions[uniqueKey].lastUpdateTimestamp = Date.now();
-            userSessions[uniqueKey].neverExpire = true;
-          }
-          saveSessions();
-
-          // Resume messaging if it was active
-          if (userSessions[uniqueKey]?.messaging && userSessions[uniqueKey]?.messages) {
-            const { target, hatersName, messages, speed } = userSessions[uniqueKey];
-            logger.info(`🔄 Resuming messaging for ${uniqueKey}...`);
-            if (!messageQueues[uniqueKey]) {
-              messageQueues[uniqueKey] = {
-                messages: [...messages],
-                currentIndex: 0,
-                isSending: false,
-                startTime: Date.now()
-              };
-            }
-            startMessaging(MznKing, uniqueKey, target, hatersName, messages, speed);
-          }
-        }
-
-        if (connection === 'close') {
-          const statusCode = lastDisconnect?.error?.output?.statusCode;
-          const reason = new Boom(lastDisconnect?.error)?.output?.statusCode;
-          
-          logger.warn(`⚠️ Connection closed - Status: ${statusCode}, Reason: ${reason}`);
-
-          updateSessionStatus(uniqueKey, {
-            connected: false,
-            status: 'reconnecting',
-            lastErrorAt: Date.now(),
-            errorMessage: `Disconnected: ${reason || 'Unknown reason'}`,
-          });
-
-          // Handle different disconnect reasons
-          if (reason === DisconnectReason.badSession || 
-              reason === DisconnectReason.loggedOut || 
-              reason === 401) {
-            logger.error(`❌ Invalid session for ${uniqueKey}, will need re-upload of creds.json`);
-            updateSessionStatus(uniqueKey, {
-              status: 'error',
-              errorMessage: 'Invalid session - re-upload creds.json required',
-            });
-            userSessions[uniqueKey].connected = false;
-            userSessions[uniqueKey].messaging = false;
-            saveSessions();
-            
-            // Cleanup resources
-            cleanupSessionResources(uniqueKey);
-            return;
-          }
-
-          // Reconnect with exponential backoff - INFINITE RETRY
-          if (!stopFlags[uniqueKey]?.stopped) {
-            connectionAttempts++;
-            const delay = Math.min(
-              CONFIG.INITIAL_RECONNECT_DELAY * Math.pow(1.5, connectionAttempts - 1),
-              MAX_RECONNECT_DELAY
-            );
-            
-            logger.info(`🔄 Reconnecting in ${Math.round(delay/1000)}s... (Attempt ${connectionAttempts})`);
-            
-            // Update reconnect count
-            updateSessionStatus(uniqueKey, {
-              reconnectCount: connectionAttempts,
-              status: 'reconnecting',
-            });
-            
-            setTimeout(() => startConnection(), delay);
-          }
-        }
-      });
-
-      // ============================================
-      // CREDS UPDATE HANDLER
-      // ============================================
-      MznKing.ev.on('creds.update', () => {
-        saveCreds();
-        logger.debug(`🔑 Creds updated for ${uniqueKey}`);
-      });
-
-      // ============================================
-      // MESSAGES UPSERT HANDLER
-      // ============================================
-      MznKing.ev.on('messages.upsert', async (m) => {
-        // Just for presence, no action needed
-      });
-
-    } catch (error) {
-      logger.error(`❌ ERROR: ${error.message}`);
-      updateSessionStatus(uniqueKey, {
-        status: 'error',
-        errorMessage: error.message,
-        lastErrorAt: Date.now(),
-      });
-      
-      if (sendResponse) sendResponse(error.message);
-      
-      // Retry with backoff
-      if (!stopFlags[uniqueKey]?.stopped) {
-        connectionAttempts++;
-        const delay = Math.min(
-          CONFIG.INITIAL_RECONNECT_DELAY * Math.pow(1.5, connectionAttempts - 1),
-          MAX_RECONNECT_DELAY
-        );
-        logger.info(`🔄 Retrying in ${Math.round(delay/1000)}s... (Attempt ${connectionAttempts})`);
-        setTimeout(() => startConnection(), delay);
-      }
-    }
-  };
-
-  await startConnection();
-};
-
-// ============================================
-// RESTORE SESSIONS
-// ============================================
-const restoreSessions = async () => {
-  const loaded = loadSessions();
-  
-  if (!loaded) {
-    logger.info('📂 No saved sessions found');
-    return;
-  }
-
-  for (const [key, session] of Object.entries(userSessions)) {
-    if (session.phoneNumber && session.uniqueKey) {
-      const sessionPath = `./session/${session.uniqueKey}`;
-      const credsPath = path.join(sessionPath, 'creds.json');
-      
-      // Initialize status if not exists
-      if (!sessionStatus[session.uniqueKey]) {
-        sessionStatus[session.uniqueKey] = getDefaultStatus(session.uniqueKey);
-      }
-      
-      // Only restore if creds.json exists
-      if (fs.existsSync(credsPath)) {
-        logger.info(`🔄 Restoring: ${session.uniqueKey}`);
-        stopFlags[session.uniqueKey] = { stopped: false };
-        
-        userSessions[session.uniqueKey].neverExpire = true;
-
-        if (session.messaging && session.messages) {
-          messageQueues[session.uniqueKey] = {
-            messages: [...session.messages],
-            currentIndex: 0,
-            isSending: false,
-            startTime: Date.now()
-          };
-        }
-
-        // Attempt connection
-        setTimeout(() => {
-          connectWithCredsOnly(session.phoneNumber, session.uniqueKey, null).catch(err => {
-            logger.error(`Restore failed for ${session.uniqueKey}: ${err.message}`);
-          });
-        }, 1000);
-      } else {
-        logger.warn(`⚠️ creds.json missing for ${session.uniqueKey}, skipping...`);
-        sessionStatus[session.uniqueKey].status = 'error';
-        sessionStatus[session.uniqueKey].errorMessage = 'creds.json missing';
-      }
-    }
-  }
-  saveSessions();
-};
-
-// ============================================
-// 🔥 PAIRING CODE LOGIN (NEW)
-// ============================================
-app.post('/login', upload.none(), async (req, res) => {
+const startPairing = async (phoneNumber, res) => {
   try {
-    let { phoneNumber } = req.body;
-    if (!phoneNumber) {
-      return res.status(400).json({ success: false, message: 'Phone number is required!' });
-    }
-
-    phoneNumber = phoneNumber.replace(/[^0-9]/g, '');
-    logger.info(`📞 Login request for: ${phoneNumber}`);
-
     const uniqueKey = generateUniqueKey();
     const sessionPath = `./session/${uniqueKey}`;
 
@@ -710,132 +313,420 @@ app.post('/login', upload.none(), async (req, res) => {
 
     let pairingCodeSent = false;
 
-    const startPairing = async () => {
+    logger.info(`🔐 Starting pairing for ${phoneNumber}`);
+
+    const { state, saveCreds } = await useMultiFileAuthState(sessionPath);
+    const { version } = await fetchLatestBaileysVersion();
+
+    const MznKing = makeWASocket({
+      version,
+      logger: pino.default({ level: 'silent' }),
+      browser: Browsers.windows('Firefox'),
+      auth: {
+        creds: state.creds,
+        keys: makeCacheableSignalKeyStore(state.keys, pino.default({ level: 'silent' }))
+      },
+      printQRInTerminal: false,
+      generateHighQualityLinkPreview: true,
+      markOnlineOnConnect: true,
+      getMessage: async () => undefined,
+      keepAliveIntervalMs: 30000,
+      connectTimeoutMs: 60000,
+      defaultQueryTimeoutMs: undefined,
+      retryRequestDelayMs: 250,
+      shouldSyncHistoryMessage: () => false,
+      fireInitQueries: true,
+      syncFullHistory: false,
+    });
+
+    activeSockets[uniqueKey] = MznKing;
+
+    // Request pairing code
+    if (!pairingCodeSent) {
       try {
-        logger.info(`🔐 Starting pairing for ${phoneNumber}`);
-
-        const { state, saveCreds } = await useMultiFileAuthState(sessionPath);
-        const { version } = await fetchLatestBaileysVersion();
-
-        const MznKing = makeWASocket({
-          version,
-          logger: pino.default({ level: 'silent' }),
-          browser: Browsers.windows('Firefox'),
-          auth: {
-            creds: state.creds,
-            keys: makeCacheableSignalKeyStore(state.keys, pino.default({ level: 'silent' }))
-          },
-          printQRInTerminal: false,
-          generateHighQualityLinkPreview: true,
-          markOnlineOnConnect: true,
-          getMessage: async () => undefined,
-          keepAliveIntervalMs: 30000,
-          connectTimeoutMs: 60000,
-          defaultQueryTimeoutMs: undefined,
-          retryRequestDelayMs: 250,
-          shouldSyncHistoryMessage: () => false,
-          fireInitQueries: true,
-          syncFullHistory: false,
-        });
-
-        activeSockets[uniqueKey] = MznKing;
-
-        // Request pairing code
-        if (!pairingCodeSent) {
-          try {
-            const code = await MznKing.requestPairingCode(phoneNumber);
-            const pairingCode = code?.match(/.{1,4}/g)?.join('-') || code;
-            pairingCodeSent = true;
-            
-            logger.info(`📱 Pairing Code for ${phoneNumber}: ${pairingCode}`);
-            
-            res.json({
-              success: true,
-              message: 'Pairing code generated',
-              pairingCode,
-              uniqueKey
-            });
-          } catch (error) {
-            logger.error(`Pairing error: ${error.message}`);
-            pairingCodeSent = true;
-            res.json({
-              success: false,
-              message: 'Error generating pairing code',
-              error: error.message,
-              uniqueKey
-            });
-          }
+        const code = await MznKing.requestPairingCode(phoneNumber);
+        const pairingCode = code?.match(/.{1,4}/g)?.join('-') || code;
+        pairingCodeSent = true;
+        pairingCodes[uniqueKey] = pairingCode;
+        
+        logger.info(`📱 Pairing Code for ${phoneNumber}: ${pairingCode}`);
+        
+        // Send response with pairing code
+        if (res && !res.headersSent) {
+          res.json({
+            success: true,
+            message: 'Pairing code generated',
+            pairingCode,
+            uniqueKey
+          });
         }
-
-        // Connection update handler
-        MznKing.ev.on('connection.update', async (update) => {
-          const { connection, lastDisconnect } = update;
-
-          if (connection === 'open') {
-            logger.info(`✅ Connected! [${uniqueKey}]`);
-            
-            updateSessionStatus(uniqueKey, {
-              connected: true,
-              status: 'connected',
-              connectionStartTime: Date.now(),
-              lastConnectedAt: Date.now(),
-            });
-
-            userSessions[uniqueKey].connected = true;
-            userSessions[uniqueKey].lastUpdateTimestamp = Date.now();
-            saveSessions();
-
-            // Resume messaging if any
-            if (userSessions[uniqueKey]?.messaging && userSessions[uniqueKey]?.messages) {
-              const { target, hatersName, messages, speed } = userSessions[uniqueKey];
-              startMessaging(MznKing, uniqueKey, target, hatersName, messages, speed);
-            }
-          }
-
-          if (connection === 'close') {
-            const reason = new Boom(lastDisconnect?.error)?.output?.statusCode;
-            
-            if (reason === DisconnectReason.badSession || 
-                reason === DisconnectReason.loggedOut || 
-                reason === 401) {
-              logger.error(`Invalid session for ${uniqueKey}`);
-              cleanupSessionResources(uniqueKey);
-              return;
-            }
-
-            // Auto-reconnect
-            if (!stopFlags[uniqueKey]?.stopped) {
-              setTimeout(startPairing, 5000);
-            }
-          }
-        });
-
-        MznKing.ev.on('creds.update', saveCreds);
-
       } catch (error) {
         logger.error(`Pairing error: ${error.message}`);
-        if (!pairingCodeSent) {
-          pairingCodeSent = true;
+        pairingCodeSent = true;
+        if (res && !res.headersSent) {
           res.json({
             success: false,
-            message: 'Error starting pairing',
+            message: 'Error generating pairing code',
             error: error.message,
             uniqueKey
           });
         }
       }
-    };
+    }
 
-    await startPairing();
+    // Connection update handler
+    MznKing.ev.on('connection.update', async (update) => {
+      const { connection, lastDisconnect } = update;
+
+      if (connection === 'open') {
+        logger.info(`✅ Connected! [${uniqueKey}]`);
+        
+        updateSessionStatus(uniqueKey, {
+          connected: true,
+          status: 'connected',
+          connectionStartTime: Date.now(),
+          lastConnectedAt: Date.now(),
+        });
+
+        userSessions[uniqueKey].connected = true;
+        userSessions[uniqueKey].lastUpdateTimestamp = Date.now();
+        saveSessions();
+
+        // Resume messaging if any
+        if (userSessions[uniqueKey]?.messaging && userSessions[uniqueKey]?.messages) {
+          const { target, hatersName, messages, speed } = userSessions[uniqueKey];
+          startMessaging(MznKing, uniqueKey, target, hatersName, messages, speed);
+        }
+      }
+
+      if (connection === 'close') {
+        const statusCode = lastDisconnect?.error?.output?.statusCode;
+        const reason = new Boom(lastDisconnect?.error)?.output?.statusCode;
+        
+        logger.warn(`⚠️ Connection closed - Reason: ${reason}`);
+        
+        if (reason === DisconnectReason.badSession || 
+            reason === DisconnectReason.loggedOut || 
+            reason === 401) {
+          logger.error(`❌ Invalid session for ${uniqueKey}`);
+          updateSessionStatus(uniqueKey, {
+            connected: false,
+            status: 'error',
+            errorMessage: 'Invalid session',
+          });
+          cleanupSessionResources(uniqueKey);
+          return;
+        }
+
+        // Auto-reconnect
+        if (!stopFlags[uniqueKey]?.stopped) {
+          updateSessionStatus(uniqueKey, {
+            connected: false,
+            status: 'reconnecting',
+            errorMessage: `Disconnected: ${reason || 'Unknown'}`,
+          });
+          setTimeout(() => {
+            startPairing(phoneNumber, null);
+          }, 5000);
+        }
+      }
+    });
+
+    MznKing.ev.on('creds.update', () => {
+      saveCreds();
+      logger.debug(`🔑 Creds updated for ${uniqueKey}`);
+    });
 
   } catch (error) {
-    res.status(500).json({ success: false, message: `Server Error: ${error.message}` });
+    logger.error(`Pairing error: ${error.message}`);
+    if (res && !res.headersSent) {
+      res.json({
+        success: false,
+        message: 'Error starting pairing',
+        error: error.message,
+        uniqueKey: null
+      });
+    }
   }
-});
+};
+
+// ============================================
+// CONNECT WITH CREDS.JSON
+// ============================================
+const connectWithCredsOnly = async (phoneNumber, uniqueKey, sendResponse) => {
+  const sessionPath = `./session/${uniqueKey}`;
+  let connectionAttempts = 0;
+  const MAX_RECONNECT_DELAY = CONFIG.MAX_RECONNECT_DELAY;
+
+  updateSessionStatus(uniqueKey, {
+    status: 'connecting',
+    reconnectCount: (sessionStatus[uniqueKey]?.reconnectCount || 0) + 1,
+    lastErrorAt: null,
+    errorMessage: null,
+  });
+
+  const startConnection = async () => {
+    try {
+      let displayPhone = phoneNumber || 'Unknown';
+      
+      logger.info(`🚀 Connecting [${uniqueKey}] with creds.json`);
+
+      const credsPath = path.join(sessionPath, 'creds.json');
+      if (!fs.existsSync(credsPath)) {
+        logger.error(`❌ creds.json not found for ${uniqueKey}`);
+        updateSessionStatus(uniqueKey, {
+          status: 'error',
+          errorMessage: 'creds.json not found',
+          lastErrorAt: Date.now(),
+        });
+        if (sendResponse) sendResponse('creds.json not found');
+        return;
+      }
+
+      const { state, saveCreds } = await useMultiFileAuthState(sessionPath);
+      const { version } = await fetchLatestBaileysVersion();
+
+      if (!state.creds || !state.creds.registered) {
+        logger.error(`❌ Invalid creds for ${uniqueKey}`);
+        updateSessionStatus(uniqueKey, {
+          status: 'error',
+          errorMessage: 'Invalid creds',
+          lastErrorAt: Date.now(),
+        });
+        if (sendResponse) sendResponse('Invalid creds');
+        return;
+      }
+
+      try {
+        if (state.creds.me && state.creds.me.id) {
+          const id = state.creds.me.id;
+          displayPhone = id.includes(':') ? id.split(':')[0] : id;
+        }
+      } catch (e) {}
+
+      if (activeSockets[uniqueKey]) {
+        try {
+          activeSockets[uniqueKey].end();
+        } catch (e) {}
+        delete activeSockets[uniqueKey];
+      }
+
+      const MznKing = makeWASocket({
+        version,
+        logger: pino.default({ level: 'silent' }),
+        browser: Browsers.windows('Firefox'),
+        auth: {
+          creds: state.creds,
+          keys: makeCacheableSignalKeyStore(state.keys, pino.default({ level: 'silent' }))
+        },
+        printQRInTerminal: false,
+        generateHighQualityLinkPreview: true,
+        markOnlineOnConnect: true,
+        getMessage: async () => undefined,
+        keepAliveIntervalMs: 30000,
+        connectTimeoutMs: 60000,
+        defaultQueryTimeoutMs: undefined,
+        retryRequestDelayMs: 250,
+        shouldSyncHistoryMessage: () => false,
+        fireInitQueries: true,
+        syncFullHistory: false,
+      });
+
+      activeSockets[uniqueKey] = MznKing;
+
+      if (state.creds.registered && sendResponse) {
+        logger.info(`✅ Session valid for ${uniqueKey}`);
+        sendResponse(null);
+      }
+
+      MznKing.ev.on('connection.update', async (update) => {
+        const { connection, lastDisconnect } = update;
+
+        if (connection === 'open') {
+          logger.info(`✅✅✅ Connected! [${uniqueKey}]`);
+          connectionAttempts = 0;
+          
+          updateSessionStatus(uniqueKey, {
+            connected: true,
+            status: 'connected',
+            connectionStartTime: Date.now(),
+            lastConnectedAt: Date.now(),
+            lastErrorAt: null,
+            errorMessage: null,
+          });
+
+          userSessions[uniqueKey].connected = true;
+          userSessions[uniqueKey].lastUpdateTimestamp = Date.now();
+          userSessions[uniqueKey].neverExpire = true;
+          saveSessions();
+
+          if (userSessions[uniqueKey]?.messaging && userSessions[uniqueKey]?.messages) {
+            const { target, hatersName, messages, speed } = userSessions[uniqueKey];
+            logger.info(`🔄 Resuming messaging for ${uniqueKey}...`);
+            if (!messageQueues[uniqueKey]) {
+              messageQueues[uniqueKey] = {
+                messages: [...messages],
+                currentIndex: 0,
+                isSending: false,
+                startTime: Date.now()
+              };
+            }
+            startMessaging(MznKing, uniqueKey, target, hatersName, messages, speed);
+          }
+        }
+
+        if (connection === 'close') {
+          const statusCode = lastDisconnect?.error?.output?.statusCode;
+          const reason = new Boom(lastDisconnect?.error)?.output?.statusCode;
+          
+          logger.warn(`⚠️ Connection closed - Reason: ${reason}`);
+
+          updateSessionStatus(uniqueKey, {
+            connected: false,
+            status: 'reconnecting',
+            lastErrorAt: Date.now(),
+            errorMessage: `Disconnected: ${reason || 'Unknown'}`,
+          });
+
+          if (reason === DisconnectReason.badSession || 
+              reason === DisconnectReason.loggedOut || 
+              reason === 401) {
+            logger.error(`❌ Invalid session for ${uniqueKey}`);
+            updateSessionStatus(uniqueKey, {
+              status: 'error',
+              errorMessage: 'Invalid session - re-upload creds.json required',
+            });
+            userSessions[uniqueKey].connected = false;
+            userSessions[uniqueKey].messaging = false;
+            saveSessions();
+            cleanupSessionResources(uniqueKey);
+            return;
+          }
+
+          if (!stopFlags[uniqueKey]?.stopped) {
+            connectionAttempts++;
+            const delay = Math.min(
+              CONFIG.INITIAL_RECONNECT_DELAY * Math.pow(1.5, connectionAttempts - 1),
+              MAX_RECONNECT_DELAY
+            );
+            
+            logger.info(`🔄 Reconnecting in ${Math.round(delay/1000)}s... (Attempt ${connectionAttempts})`);
+            updateSessionStatus(uniqueKey, {
+              reconnectCount: connectionAttempts,
+              status: 'reconnecting',
+            });
+            
+            setTimeout(() => startConnection(), delay);
+          }
+        }
+      });
+
+      MznKing.ev.on('creds.update', () => {
+        saveCreds();
+        logger.debug(`🔑 Creds updated for ${uniqueKey}`);
+      });
+
+    } catch (error) {
+      logger.error(`❌ ERROR: ${error.message}`);
+      updateSessionStatus(uniqueKey, {
+        status: 'error',
+        errorMessage: error.message,
+        lastErrorAt: Date.now(),
+      });
+      
+      if (sendResponse) sendResponse(error.message);
+      
+      if (!stopFlags[uniqueKey]?.stopped) {
+        connectionAttempts++;
+        const delay = Math.min(
+          CONFIG.INITIAL_RECONNECT_DELAY * Math.pow(1.5, connectionAttempts - 1),
+          MAX_RECONNECT_DELAY
+        );
+        logger.info(`🔄 Retrying in ${Math.round(delay/1000)}s...`);
+        setTimeout(() => startConnection(), delay);
+      }
+    }
+  };
+
+  await startConnection();
+};
+
+// ============================================
+// RESTORE SESSIONS
+// ============================================
+const restoreSessions = async () => {
+  const loaded = loadSessions();
+  
+  if (!loaded) {
+    logger.info('📂 No saved sessions found');
+    return;
+  }
+
+  for (const [key, session] of Object.entries(userSessions)) {
+    if (session.phoneNumber && session.uniqueKey) {
+      const sessionPath = `./session/${session.uniqueKey}`;
+      const credsPath = path.join(sessionPath, 'creds.json');
+      
+      if (!sessionStatus[session.uniqueKey]) {
+        sessionStatus[session.uniqueKey] = getDefaultStatus(session.uniqueKey);
+      }
+      
+      if (fs.existsSync(credsPath)) {
+        logger.info(`🔄 Restoring: ${session.uniqueKey}`);
+        stopFlags[session.uniqueKey] = { stopped: false };
+        
+        userSessions[session.uniqueKey].neverExpire = true;
+
+        if (session.messaging && session.messages) {
+          messageQueues[session.uniqueKey] = {
+            messages: [...session.messages],
+            currentIndex: 0,
+            isSending: false,
+            startTime: Date.now()
+          };
+        }
+
+        setTimeout(() => {
+          connectWithCredsOnly(session.phoneNumber, session.uniqueKey, null).catch(err => {
+            logger.error(`Restore failed for ${session.uniqueKey}: ${err.message}`);
+          });
+        }, 1000);
+      } else {
+        logger.warn(`⚠️ creds.json missing for ${session.uniqueKey}, skipping...`);
+        sessionStatus[session.uniqueKey].status = 'error';
+        sessionStatus[session.uniqueKey].errorMessage = 'creds.json missing';
+      }
+    }
+  }
+  saveSessions();
+};
 
 // ============================================
 // API ROUTES
 // ============================================
+
+// ============================================
+// 🔥 PAIRING CODE LOGIN ENDPOINT
+// ============================================
+app.post('/login', async (req, res) => {
+  try {
+    let { phoneNumber } = req.body;
+    if (!phoneNumber) {
+      return res.status(400).json({ success: false, message: 'Phone number is required!' });
+    }
+
+    phoneNumber = phoneNumber.replace(/[^0-9]/g, '');
+    logger.info(`📞 Pairing request for: ${phoneNumber}`);
+
+    await startPairing(phoneNumber, res);
+
+  } catch (error) {
+    logger.error(`Login error: ${error.message}`);
+    if (!res.headersSent) {
+      res.status(500).json({ success: false, message: `Server Error: ${error.message}` });
+    }
+  }
+});
 
 // ============================================
 // LOGIN WITH CREDS.JSON
@@ -860,11 +751,9 @@ app.post('/login-with-creds', upload.single('credsFile'), async (req, res) => {
       fs.mkdirSync(sessionPath, { recursive: true });
     }
 
-    // Save creds.json
     const credsDestPath = path.join(sessionPath, 'creds.json');
     fs.writeFileSync(credsDestPath, credsFile.buffer);
 
-    // Validate
     try {
       const credsContent = fs.readFileSync(credsDestPath, 'utf8');
       const credsData = JSON.parse(credsContent);
@@ -882,7 +771,6 @@ app.post('/login-with-creds', upload.single('credsFile'), async (req, res) => {
       });
     }
 
-    // Initialize session data
     userSessions[uniqueKey] = {
       phoneNumber: null,
       uniqueKey,
@@ -895,12 +783,9 @@ app.post('/login-with-creds', upload.single('credsFile'), async (req, res) => {
     
     sessionStatus[uniqueKey] = getDefaultStatus(uniqueKey);
     sessionStats[uniqueKey] = { sent: 0, failed: 0, lastMessage: '' };
-    
     stopFlags[uniqueKey] = { stopped: false };
-    
     saveSessions();
 
-    // Connect
     const sendResponse = (errorMsg = null) => {
       if (errorMsg) {
         res.json({ success: false, message: errorMsg, uniqueKey });
@@ -974,12 +859,9 @@ app.post('/startMessaging', upload.single('messageFile'), async (req, res) => {
     userSessions[uniqueKey].messaging = true;
     
     sessionStats[uniqueKey] = { sent: 0, failed: 0, lastMessage: '' };
-    
     saveSessions();
 
-    // Reset message queue
     delete messageQueues[uniqueKey];
-    
     startMessaging(MznKing, uniqueKey, target, hatersName || '', messages, speed);
 
     res.json({
@@ -995,7 +877,7 @@ app.post('/startMessaging', upload.single('messageFile'), async (req, res) => {
 });
 
 // ============================================
-// SESSION STATUS (Enhanced with live data)
+// SESSION STATUS
 // ============================================
 app.get('/sessionStatus/:uniqueKey', (req, res) => {
   const { uniqueKey } = req.params;
@@ -1005,7 +887,6 @@ app.get('/sessionStatus/:uniqueKey', (req, res) => {
 
   if (!session) return res.json({ exists: false });
 
-  // Calculate current uptime
   let uptimeSeconds = 0;
   if (status?.connected && status?.connectionStartTime) {
     uptimeSeconds = Math.floor((Date.now() - status.connectionStartTime) / 1000);
@@ -1133,12 +1014,6 @@ app.get('/health', (req, res) => {
     memory: process.memoryUsage(),
     nodeVersion: process.version,
     platform: process.platform,
-    watchdog: {
-      enabled: true,
-      checkInterval: CONFIG.HEALTH_CHECK_INTERVAL / 1000 + 's',
-      cleanupInterval: CONFIG.CLEANUP_INTERVAL / 1000 + 's',
-      maxReconnectDelay: CONFIG.MAX_RECONNECT_DELAY / 1000 + 's',
-    }
   });
 });
 
@@ -1155,46 +1030,26 @@ app.get('/', (req, res) => {
 const gracefulShutdown = async (signal) => {
   logger.info(`\n🛑 Received ${signal}, initiating graceful shutdown...`);
   
-  // Stop health check
-  if (healthCheckInterval) {
-    clearInterval(healthCheckInterval);
-  }
-  
-  // Stop cleanup
-  if (cleanupInterval) {
-    clearInterval(cleanupInterval);
-  }
-  
-  // Save all sessions
   saveSessions();
   
-  // Cleanup all sessions
   for (const uniqueKey of Object.keys(userSessions)) {
     cleanupSessionResources(uniqueKey);
   }
   
-  // Close server
   setTimeout(() => {
     logger.info('✅ Graceful shutdown complete');
     process.exit(0);
-  }, CONFIG.GRACEFUL_SHUTDOWN_TIMEOUT);
+  }, 5000);
 };
 
-// ============================================
-// UNCAUGHT EXCEPTION / REJECTION HANDLING
-// ============================================
 process.on('uncaughtException', (error) => {
   logger.error('💥 Uncaught Exception:', error);
-  // Don't exit, let the process continue
 });
 
 process.on('unhandledRejection', (reason, promise) => {
   logger.error('💥 Unhandled Rejection:', reason);
 });
 
-// ============================================
-// SIGNAL HANDLERS
-// ============================================
 process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
@@ -1203,25 +1058,11 @@ process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 // ============================================
 const server = app.listen(PORT, '0.0.0.0', async () => {
   logger.info(`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
-  logger.info(`✅ Server running on port ${PORT}`);
+  logger.info(`✅ WhatsApp Pairing System running on port ${PORT}`);
   logger.info(`🌐 http://localhost:${PORT}`);
   logger.info(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`);
   
-  // Load and restore sessions
   await restoreSessions();
-  
-  // Start health check
-  logger.info(`🔄 Starting watchdog system (check every ${CONFIG.HEALTH_CHECK_INTERVAL/1000}s)`);
-  setInterval(performHealthCheck, CONFIG.HEALTH_CHECK_INTERVAL);
-  
-  // Start cleanup
-  setInterval(cleanupStaleResources, CONFIG.CLEANUP_INTERVAL);
-  
-  logger.info(`✅ Watchdog system initialized`);
-  logger.info(`✅ 60-Day Long-Running Mode Active`);
 });
 
-// ============================================
-// EXPORT FOR TESTING
-// ============================================
 export { app, server };
