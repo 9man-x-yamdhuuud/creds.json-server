@@ -1,15 +1,12 @@
 {
-  "name": "whatsapp-auto-messenger",
-  "version": "3.0.0",
-  "description": "60-Day Long-Running WhatsApp Auto-Messenger with Watchdog System",
+  "name": "whatsapp-pairing-system",
+  "version": "2.0.0",
+  "description": "WhatsApp Pairing System with creds.json + Pairing Code + Fetch Groups",
   "main": "index.js",
   "type": "module",
   "scripts": {
     "start": "node index.js",
-    "dev": "node --watch index.js",
-    "pm2": "pm2 start ecosystem.config.cjs",
-    "pm2:stop": "pm2 stop ecosystem.config.cjs",
-    "pm2:logs": "pm2 logs whatsapp-messenger"
+    "dev": "node --watch index.js"
   },
   "dependencies": {
     "@hapi/boom": "^10.0.1",
