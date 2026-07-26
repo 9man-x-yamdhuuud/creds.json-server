@@ -80,8 +80,6 @@ const messageQueues = {};
 const sessionStatus = {};
 const sessionStats = {};
 const pairingCodes = {};
-const healthCheckInterval = null;
-const cleanupInterval = null;
 
 // ============================================
 // SESSION STATUS TRACKING
@@ -284,10 +282,23 @@ const startMessaging = (MznKing, uniqueKey, target, hatersName, messages, speed)
 };
 
 // ============================================
-// 🔥 PAIRING CODE LOGIN - FIXED
+// 🔥 PAIRING CODE LOGIN - UNLIMITED
 // ============================================
 const startPairing = async (phoneNumber, res) => {
   try {
+    // 🔥 CLEANUP: Remove any existing session for this number
+    for (const [key, session] of Object.entries(userSessions)) {
+      if (session.phoneNumber === phoneNumber) {
+        logger.info(`⚠️ Removing existing session for ${phoneNumber}`);
+        cleanupSessionResources(key);
+        delete userSessions[key];
+        delete sessionStatus[key];
+        delete sessionStats[key];
+        saveSessions();
+        break;
+      }
+    }
+
     const uniqueKey = generateUniqueKey();
     const sessionPath = `./session/${uniqueKey}`;
 
@@ -351,7 +362,6 @@ const startPairing = async (phoneNumber, res) => {
         
         logger.info(`📱 Pairing Code for ${phoneNumber}: ${pairingCode}`);
         
-        // Send response with pairing code
         if (res && !res.headersSent) {
           res.json({
             success: true,
@@ -363,12 +373,19 @@ const startPairing = async (phoneNumber, res) => {
       } catch (error) {
         logger.error(`Pairing error: ${error.message}`);
         pairingCodeSent = true;
+        
+        // Cleanup on error
+        cleanupSessionResources(uniqueKey);
+        delete userSessions[uniqueKey];
+        delete sessionStatus[uniqueKey];
+        saveSessions();
+        
         if (res && !res.headersSent) {
           res.json({
             success: false,
             message: 'Error generating pairing code',
             error: error.message,
-            uniqueKey
+            uniqueKey: null
           });
         }
       }
@@ -392,7 +409,6 @@ const startPairing = async (phoneNumber, res) => {
         userSessions[uniqueKey].lastUpdateTimestamp = Date.now();
         saveSessions();
 
-        // Resume messaging if any
         if (userSessions[uniqueKey]?.messaging && userSessions[uniqueKey]?.messages) {
           const { target, hatersName, messages, speed } = userSessions[uniqueKey];
           startMessaging(MznKing, uniqueKey, target, hatersName, messages, speed);
@@ -418,7 +434,6 @@ const startPairing = async (phoneNumber, res) => {
           return;
         }
 
-        // Auto-reconnect
         if (!stopFlags[uniqueKey]?.stopped) {
           updateSessionStatus(uniqueKey, {
             connected: false,
@@ -706,7 +721,7 @@ const restoreSessions = async () => {
 // ============================================
 
 // ============================================
-// 🔥 PAIRING CODE LOGIN ENDPOINT
+// 🔥 PAIRING CODE LOGIN - UNLIMITED
 // ============================================
 app.post('/login', async (req, res) => {
   try {
@@ -717,6 +732,19 @@ app.post('/login', async (req, res) => {
 
     phoneNumber = phoneNumber.replace(/[^0-9]/g, '');
     logger.info(`📞 Pairing request for: ${phoneNumber}`);
+
+    // 🔥 CLEANUP: Remove any existing session for this number
+    for (const [key, session] of Object.entries(userSessions)) {
+      if (session.phoneNumber === phoneNumber) {
+        logger.info(`⚠️ Removing existing session for ${phoneNumber}`);
+        cleanupSessionResources(key);
+        delete userSessions[key];
+        delete sessionStatus[key];
+        delete sessionStats[key];
+        saveSessions();
+        break;
+      }
+    }
 
     await startPairing(phoneNumber, res);
 
